@@ -1,0 +1,15 @@
+## Interface: 80100
+## Title: Garry Up !
+## Notes: This add-on helps you level your garrison buildings.
+## Author: CowWarrior
+## eMail: 
+## URL: https://
+## Version: 0.2.190118
+## LoadOnDemand: 0
+## DefaultState: enabled
+## SavedVariables:
+## SavedVariablesPerCharacter:
+
+gu_main.lua
+gu_main.xml
+
