@@ -84,6 +84,11 @@ GU_ACH_SAVAGEA_NAME = "Savage Friends (alliance)";
 GU_ACH_MTH_ID = 10348; --9726  --10348;
 GU_ACH_MTH_NAME = "Master Treasure Hunter";
 
+GU_ACH_SALVAGING_ID = 9468;
+GU_ACH_SALVAGING_NAME = "Salvaging Pays Off";
+GU_ACH_TRAPPER_ID = 9565;
+GU_ACH_TRAPPER_NAME = "Master Trapper";
+
 
 -- QuestLines
 

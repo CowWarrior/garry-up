@@ -150,7 +150,10 @@
 <Frame name="GarryUpFrame" inherits="GarryUpSimpleFrameTemplate" >
 	<Scripts>
 		<OnLoad>GarryUp_OnMainFrameLoad()</OnLoad>
-	</Scripts>	
+	</Scripts>
+	<Size>
+		<AbsDimension x="240" y="175"/>
+	</Size>
 	<Frames>
 		<Button name="$parentTinyCloseButton" hidden="false" inherits="UIPanelCloseButton">
 			<Anchors><Anchor point="TOPRIGHT"><Offset><AbsDimension x="0" y="0" /></Offset></Anchor></Anchors>

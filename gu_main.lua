@@ -389,7 +389,12 @@ function GarryUp_GetDraenorDataBulkText()
 	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_RANKS_ID)..GU_ACH_RANKS_NAME.." "..GarryUp_GetAchData(GU_ACH_RANKS_ID)..GU_COLOR_END.."\r";
 	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_PETB_ID)..GU_ACH_PETB_NAME.." "..GarryUp_GetAchData(GU_ACH_PETB_ID)..GU_COLOR_END.."\r";
 	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_MONEY_ID)..GU_ACH_MONEY_NAME.." "..GarryUp_GetAchDataGold(GU_ACH_MONEY_ID)..GU_COLOR_END.."\r";
-	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_MTH_ID)..GU_ACH_MTH_NAME.." "..GarryUp_GetAchDataGold(GU_ACH_MTH_ID)..GU_COLOR_END.."\r";
+	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_MTH_ID)..GU_ACH_MTH_NAME.." "..GarryUp_GetAchData(GU_ACH_MTH_ID)..GU_COLOR_END.."\r";
+	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_SALVAGING_ID)..GU_ACH_SALVAGING_NAME.." "..GarryUp_GetAchData(GU_ACH_SALVAGING_ID)..GU_COLOR_END.."\r";
+	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_TRAPPER_ID)..GU_ACH_TRAPPER_NAME.." "..GarryUp_GetAchData(GU_ACH_TRAPPER_ID)..GU_COLOR_END.."\r";
+	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_SAVAGEA_ID)..GU_ACH_SAVAGEA_NAME.." "..GarryUp_GetAchData(GU_ACH_SAVAGEA_ID)..GU_COLOR_END.."\r";
+
+
 
 	return outText;
 end
