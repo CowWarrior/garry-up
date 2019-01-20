@@ -10,82 +10,86 @@
 -- *
 -- *****************************************************************************
 
+--TODO: Need to reduce the number of global variables.
+
 -- Color Constants
-local GU_COLOR_ADDON = "|cffff007f";
-local GU_COLOR_END = "|r";
-local GU_COLOR_RED = "|cffff0000";
-local GU_COLOR_GREEN = "|cff00ff00";
-local GU_COLOR_BLUE = "|cff0000ff";
-local GU_COLOR_WHITE = "|cffffffff";
-local GU_COLOR_BLACK = "|cff000000";
-local GU_COLOR_PROGRESS_0 = "|cff7d7d7d"; --grey
-local GU_COLOR_PROGRESS_25 = "|cff7d7d00"; --dark yellow
-local GU_COLOR_PROGRESS_50 = "|cffffd100"; --brighter yellow
-local GU_COLOR_PROGRESS_75 = "|cffffffff"; --white
-local GU_COLOR_PROGRESS_100 = GU_COLOR_GREEN; --green
+GU_COLOR_ADDON = "|cffff007f";
+GU_COLOR_END = "|r";
+GU_COLOR_RED = "|cffff0000";
+GU_COLOR_GREEN = "|cff00ff00";
+GU_COLOR_BLUE = "|cff0000ff";
+GU_COLOR_WHITE = "|cffffffff";
+GU_COLOR_BLACK = "|cff000000";
+GU_COLOR_PROGRESS_0 = "|cff7d7d7d"; --grey
+GU_COLOR_PROGRESS_25 = "|cff7d7d00"; --dark yellow
+GU_COLOR_PROGRESS_50 = "|cffffd100"; --brighter yellow
+GU_COLOR_PROGRESS_75 = "|cffffffff"; --white
+GU_COLOR_PROGRESS_100 = GU_COLOR_GREEN; --green
 
 -- Chat Icons
-local GU_TXTICO_CHECK = "!X!";
-local GU_TXTICO_END = "|t";
+GU_TXTICO_CHECK = "!X!";
+GU_TXTICO_END = "|t";
 
 -- Event Constants
-local GU_EVENT_LOGIN = "PLAYER_LOGIN";
-local GU_EVENT_LOOT = "CHAT_MSG_LOOT";
-local GU_EVENT_BUFF_CHANGED = "UNIT_AURA";
-local GU_EVENT_ZONE_CHANGED = "ZONE_CHANGED_NEW_AREA";
-local GU_EVENT_ACHIEVEMENT = "ACHIEVEMENT_EARNED"
+GU_EVENT_LOGIN = "PLAYER_LOGIN";
+GU_EVENT_LOOT = "CHAT_MSG_LOOT";
+GU_EVENT_BUFF_CHANGED = "UNIT_AURA";
+GU_EVENT_ZONE_CHANGED = "ZONE_CHANGED_NEW_AREA";
+GU_EVENT_ACHIEVEMENT = "ACHIEVEMENT_EARNED"
+GU_EVENT_MINIZONE_CHANGED = "ZONE_CHANGED";
 
 -- Buff Constants
-local GU_BUFF_HOOK = "Bladebone Hook";
-local GU_BUFF_BOBBER = "Oversized Bobber";
-local GU_BUFF_SKULKER = "Jawless Skulker Bait";
+GU_BUFF_HOOK = "Bladebone Hook";
+GU_BUFF_BOBBER = "Oversized Bobber";
+GU_BUFF_SKULKER = "Jawless Skulker Bait";
 
 -- Zone Constants
-local GU_ZONE_GARRISON = "Lunarfall";
-local GU_ZONE_SHADOWMOON = "Shadowmoon Valley";
-local GU_ZONE_TALADOR = "Talador";
-local GU_ZONE_NAGRAND = "Nagrand";
-local GU_ZONE_ARAK = "Spires of Arak";
-local GU_ZONE_GORGOND = "Gorgrond";
-local GU_ZONE_FROSTFIRE = "Frostfire Ridge";
-local GU_ZONE_DRAENOR_OCEAN = "Draenor Ocean"; --Not sure yet how I will handle this
+GU_ZONE_GARRISON = "Lunarfall";
+GU_ZONE_SHADOWMOON = "Shadowmoon Valley";
+GU_ZONE_TALADOR = "Talador";
+GU_ZONE_NAGRAND = "Nagrand";
+GU_ZONE_ARAK = "Spires of Arak";
+GU_ZONE_GORGOND = "Gorgrond";
+GU_ZONE_FROSTFIRE = "Frostfire Ridge";
+GU_ZONE_DRAENOR_OCEAN = "Draenor Ocean"; --Not sure yet how I will handle this
+GU_MINIZONE_GARRISON_MINE = "Lunarfall Excavation";
 
 -- Item Constants
-local GU_ITEM_OVERSIZED_BOBBER = 136377;
-local GU_ITEM_BLADEBONE_HOOK = 122742;
+GU_ITEM_OVERSIZED_BOBBER = 136377;
+GU_ITEM_BLADEBONE_HOOK = 122742;
 
 -- Texture constants
-local GU_TEXTURE_ID_FISHING = 136245;
-local GU_TEXTURE_ID_MOUNT = 975744; --631718;
-local GU_TEXTURE_ID_GARRYUP = 1005027;
+GU_TEXTURE_ID_FISHING = 136245;
+GU_TEXTURE_ID_MOUNT = 975744; --631718;
+GU_TEXTURE_ID_GARRYUP = 1005027;
 
 -- Sound Constants
-local GU_SOUND_QUEST_LOG_ABANDON_QUEST = 846;
+GU_SOUND_QUEST_LOG_ABANDON_QUEST = 846;
 
 -- Achievements constants
-local GU_ACH_ANGLER_ID = 9462;
-local GU_ACH_ANGLER_NAME = "Draenor Angler";
-local GU_ACH_MONEY_ID = 9487;
-local GU_ACH_MONEY_NAME = "Draenor Money"; --Got My Mind On My Draenor Money
-local GU_ACH_MMOUNT_ID = 9526;
-local GU_ACH_MMOUNT_NAME = "Master of Mounts"; -- Intro to Husbandry is the pre-requisite acheivement
-local GU_ACH_RANKS_ID = 9129;
-local GU_ACH_RANKS_NAME = "Filling the Ranks";
-local GU_ACH_PETB_ID = 9463;
-local GU_ACH_PETB_NAME = "Draenic Pet Battler";
-local GU_ACH_SAVAGEH_ID = 9477;
-local GU_ACH_SAVAGEH_NAME = "Savage Friends (horde)";
-local GU_ACH_SAVAGEA_ID = 9478;
-local GU_ACH_SAVAGEA_NAME = "Savage Friends (alliance)";
-local GU_ACH_MTH_ID = 10348; --9726  --10348;
-local GU_ACH_MTH_NAME = "Master Treasure Hunter";
+GU_ACH_ANGLER_ID = 9462;
+GU_ACH_ANGLER_NAME = "Draenor Angler";
+GU_ACH_MONEY_ID = 9487;
+GU_ACH_MONEY_NAME = "Draenor Money"; --Got My Mind On My Draenor Money
+GU_ACH_MMOUNT_ID = 9526;
+GU_ACH_MMOUNT_NAME = "Master of Mounts"; -- Intro to Husbandry is the pre-requisite acheivement
+GU_ACH_RANKS_ID = 9129;
+GU_ACH_RANKS_NAME = "Filling the Ranks";
+GU_ACH_PETB_ID = 9463;
+GU_ACH_PETB_NAME = "Draenic Pet Battler";
+GU_ACH_SAVAGEH_ID = 9477;
+GU_ACH_SAVAGEH_NAME = "Savage Friends (horde)";
+GU_ACH_SAVAGEA_ID = 9478;
+GU_ACH_SAVAGEA_NAME = "Savage Friends (alliance)";
+GU_ACH_MTH_ID = 10348; --9726  --10348;
+GU_ACH_MTH_NAME = "Master Treasure Hunter";
 
 
 -- QuestLines
 
 --TODO: Convert into generic variable (constant) name and have Horde/Alliance specific data loaded into it OnLoad
 --      if UnitFactionGroup("player") == "Alliance" then
-local GU_QST_MOM_A = {}
+GU_QST_MOM_A = {}
 GU_QST_MOM_A = {
 	{ID = 37028, NAME = "Wolf Training: The Garn", DEPTH = 1},
 	{ID = 37027, NAME = "Wolf Training: Orc Hunters", DEPTH = 2},
@@ -151,7 +155,7 @@ GU_QST_MOM_A = {
 	
 }
 
-local GU_QST_MOM_H = {}
+GU_QST_MOM_H = {}
 GU_QST_MOM_H = {
 	{ID = 37111, NAME = "Wolf Training: The Garn", DEPTH = 1},
 	{ID = 37110, NAME = "Wolf Training: Orc Hunters", DEPTH = 2},
@@ -219,11 +223,11 @@ GU_QST_MOM_H = {
 
 
 --Zone Specific Fishing constants
-local GU_FISH_RECOMMEND = {};
-local GU_FISH_BAIT_BUFF = {};
-local GU_FISH_BAIT_ID = {};
-local GU_FISH_ACH_ID = {};
-local GU_FISH_ACH_NAME = {};
+GU_FISH_RECOMMEND = {};
+GU_FISH_BAIT_BUFF = {};
+GU_FISH_BAIT_ID = {};
+GU_FISH_ACH_ID = {};
+GU_FISH_ACH_NAME = {};
 
 GU_FISH_RECOMMEND[GU_ZONE_TALADOR] = "Blackwater Whiptail";
 GU_FISH_BAIT_BUFF[GU_ZONE_TALADOR] = "Blackwater Whiptail Bait";
@@ -272,3 +276,4 @@ GU_FISH_BAIT_BUFF[GU_ZONE_GARRISON] = "Any Bait";
 GU_FISH_BAIT_ID[GU_ZONE_GARRISON] = 0;
 GU_FISH_ACH_ID[GU_ZONE_GARRISON] = 9462;
 GU_FISH_ACH_NAME[GU_ZONE_GARRISON] = "Draenor Angler";
+

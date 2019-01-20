@@ -4,7 +4,7 @@
 -- *
 -- * Created by: CowWarrior
 -- * Created on: 2019-01-11
--- * Updated on: 2019-01-19
+-- * Updated on: 2019-01-20
 -- * 
 -- * Tested on : WOW 8.1
 -- *
@@ -12,10 +12,11 @@
 
 -- Constants
 local GU_NAME = "Garry Up!";
-local GU_VERSION = " 0.2.190119";
+local GU_VERSION = " 0.2.190120";
 local GU_FRAME_W = 240;
 local GU_FRAME_H = 140;
 local GU_DEBUG = false;
+local GU_DEBUG_LEVEL = 2;
 
 -- Variables
 local guHookWasActive = false;
@@ -35,6 +36,7 @@ function GarryUp_OnLoad()
 	GarryUpCoreFrame:RegisterEvent(GU_EVENT_ZONE_CHANGED);
 	GarryUpCoreFrame:RegisterEvent(GU_EVENT_LOGIN);
 	GarryUpCoreFrame:RegisterEvent(GU_EVENT_ACHIEVEMENT);
+	GarryUpCoreFrame:RegisterEvent(GU_EVENT_MINIZONE_CHANGED);
 
 	-- All done
 	GarryUp_Print("v"..GU_VERSION.." loaded. (type /gup for options)", GU_COLOR_ADDON);	
@@ -55,7 +57,7 @@ function GarryUp_OnMiniFrameLoad()
 end
 
 function GarryUp_OnEvent(self, event, ...)
-	if GU_DEBUG then
+	if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
 		GarryUp_Print("Event:"..event);
 	end
 	
@@ -64,7 +66,7 @@ function GarryUp_OnEvent(self, event, ...)
 	elseif event == GU_EVENT_BUFF_CHANGED then
 		--Check for bait/hook for current zone
 		
-		if GU_DEBUG then
+		if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
 			GarryUp_Print("BaitWasActive? "..GarryUp_BoolToString(guBaitWasActive));
 			GarryUp_Print("HookWasActive? "..GarryUp_BoolToString(guHookWasActive));
 			GarryUp_Print("BobberWasActive? "..GarryUp_BoolToString(guBobberWasActive));
@@ -108,6 +110,14 @@ function GarryUp_OnEvent(self, event, ...)
 		else
 			-- bait is off
 		end
+	elseif event == GU_EVENT_MINIZONE_CHANGED then
+			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
+				GarryUp_Print("Subzone Changed: "..GetMinimapZoneText());
+			end
+			
+			if GetMinimapZoneText() == GU_MINIZONE_GARRISON_MINE then
+				GarryUp_Print("We recommend you consume [Miner's Coffee] and [Preserved Mining Pick].");
+			end
 	elseif event == GU_EVENT_ZONE_CHANGED then
 		--Zone changed check for specific zone baits and fish to catch
 		guCurrentZone = GetZoneText();
@@ -118,7 +128,7 @@ function GarryUp_OnEvent(self, event, ...)
 		
 		--check if we're in a zone first (otherwise it crashes when stoning)
 		if GarryUp_IsInDraenor() and guCurrentZone ~= GU_ZONE_GARRISON then
-			if GU_DEBUG then
+			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
 				GarryUp_Print("Draenor!");
 			end
 			
@@ -126,7 +136,7 @@ function GarryUp_OnEvent(self, event, ...)
 			GarryUpAnglerFrameBaitButton:Show();
 			GarryUp_InitItemButton(GarryUpAnglerFrameBaitButton, GU_FISH_BAIT_ID[guCurrentZone]);
 		else
-			if GU_DEBUG then
+			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
 				GarryUp_Print("Not in Draenor...");
 			end
 			-- We're not in Draenor anymore!
@@ -149,6 +159,10 @@ function GarryUp_OnEvent(self, event, ...)
 	
 		-- now that all data is available show frame
 		--GarryUp_ShowAngler();
+	else
+		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
+			GarryUp_Print("Unhandled event: "..event);
+		end
 	end
 
 	-- Update Draenor data on any event
@@ -179,7 +193,7 @@ end
 function GarryUp_InitItemButton(buttonRef, itemID)
 	local name, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID);
 	
-	if GU_DEBUG then
+	if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
 		GarryUp_Print("Set button Icon itemID"..itemID.." name:"..name.." texture:"..icon);
 	end
 	
@@ -428,6 +442,16 @@ function GarryUp_PrintHelp()
 	GarryUp_Print(helpText);
 end
 
+function GarryUp_ToggleDebug()
+	GU_DEBUG = not GU_DEBUG;
+	
+	if GU_DEBUG then
+		GarryUp_Print("Debugging "..GU_COLOR_GREEN.."Enabled"..GU_COLOR_END.." (Level: "..GU_DEBUG_LEVEL..")");
+	else
+		GarryUp_Print("Debugging "..GU_COLOR_RED.."Disabled"..GU_COLOR_END);
+	end
+end
+
 function GarryUp_SlashCommand(args, editbox)
     
 	if args == "show" then
@@ -445,12 +469,10 @@ function GarryUp_SlashCommand(args, editbox)
 	elseif args == "help" or args == "?" then
 		GarryUp_PrintHelp();
 	elseif args == "debug" then
-		GU_DEBUG = not GU_DEBUG;
-		GarryUp_Print("Debugging enabled: "..GarryUp_BoolToString(GU_DEBUG));
+		GarryUp_ToggleDebug();
 	else
 		GarryUp_Print("Unknown Command '"..args.."'.");
 		GarryUp_PrintHelp();
 	end
 end
-
 

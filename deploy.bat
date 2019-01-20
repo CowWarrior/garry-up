@@ -1,8 +1,9 @@
 @echo off
-echo "Copying XML files..."
-copy .\*.xml %WOWADDON%\GarryUp /Y
+echo Copying XML files...
+echo Target: "%WOWADDON%\GarryUp"
+copy .\*.xml "%WOWADDON%\GarryUp" /Y
 echo "Copying LUA files..."
-copy .\*.lua %WOWADDON%\GarryUp /Y
+copy .\*.lua "%WOWADDON%\GarryUp" /Y
 echo "Copying TOC file..."
-copy .\*.lua %WOWADDON%\GarryUp /Y
+copy .\*.toc "%WOWADDON%\GarryUp" /Y
 pause

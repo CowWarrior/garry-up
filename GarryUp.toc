@@ -4,13 +4,11 @@
 ## Author: CowWarrior
 ## eMail: 
 ## URL: https://
-## Version: 0.2.190118
+## Version: 0.2.190120
 ## LoadOnDemand: 0
 ## DefaultState: enabled
 ## SavedVariables:
 ## SavedVariablesPerCharacter:
 
-gu_data.lua
-gu_main.lua
 gu_main.xml
 
