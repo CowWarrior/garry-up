@@ -10,6 +10,7 @@
 ## SavedVariables:
 ## SavedVariablesPerCharacter:
 
+gu_data.lua
 gu_main.lua
 gu_main.xml
 
