@@ -16,7 +16,7 @@ local GU_VERSION = " 0.2.190123";
 local GU_FRAME_W = 240;
 local GU_FRAME_H = 140;
 local GU_DEBUG = false;
-local GU_DEBUG_LEVEL = 2;
+local GU_DEBUG_LEVEL = 1;
 
 -- Variables
 local guHookWasActive = false;
@@ -413,6 +413,10 @@ function GarryUp_GetMOMDataBulkText()
 	
 	local _, name, _, completed, _, _, _, _, _, icon = GetAchievementInfo(GU_ACH_MMOUNT_ID);
 	
+	if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
+		GarryUp_Print("MOM Icon: name:"..name.." texture:"..icon);
+	end
+	
 	outText = "|T" .. icon .. ":0|t " .. name.. "\n\n";
 	
 	outText = outText..GarryUp_GetQuestLineBulkText(GU_QST_MOM_A);
@@ -453,6 +457,10 @@ function GarryUp_PrintHelp()
 	helpText = helpText.."/gup fish: Prints the fish you need to catch.\r";
 	helpText = helpText.."/gup draenor: Prints the acheivements you need to get.\r";
 	
+	helpText = helpText.."/gup debug: Toggle debugging.\r";
+	helpText = helpText.."/gup debug+: Increase debugging level. (give more details)\r";
+	helpText = helpText.."/gup debug+: Decrease debugging level. (give less details)\r";
+	
 	GarryUp_Print(helpText);
 end
 
@@ -464,6 +472,18 @@ function GarryUp_ToggleDebug()
 	else
 		GarryUp_Print("Debugging "..GU_COLOR_RED.."Disabled"..GU_COLOR_END);
 	end
+end
+
+function GarryUp_ChangeDebugLevel(levelDelta)
+	GU_DEBUG_LEVEL =  GU_DEBUG_LEVEL + levelDelta;
+	
+	if GU_DEBUG_LEVEL > 5 then
+		GU_DEBUG_LEVEL = 5;
+	elseif GU_DEBUG_LEVEL < 0 then
+		GU_DEBUG_LEVEL = 0;
+	end
+	
+	GarryUp_Print("Debugging Level set to: "..GU_DEBUG_LEVEL);
 end
 
 function GarryUp_SlashCommand(args, editbox)
@@ -484,6 +504,10 @@ function GarryUp_SlashCommand(args, editbox)
 		GarryUp_PrintHelp();
 	elseif args == "debug" then
 		GarryUp_ToggleDebug();
+	elseif args == "debug+" then
+		GarryUp_ChangeDebugLevel(1);		
+	elseif args == "debug-" then
+		GarryUp_ChangeDebugLevel(-1);
 	else
 		GarryUp_Print("Unknown Command '"..args.."'.");
 		GarryUp_PrintHelp();

@@ -27,8 +27,9 @@ GU_COLOR_PROGRESS_75 = "|cffffffff"; --white
 GU_COLOR_PROGRESS_100 = GU_COLOR_GREEN; --green
 
 -- Chat Icons
-GU_TXTICO_CHECK = "!X!";
-GU_TXTICO_END = "|t";
+GU_TXTICO_CHECK = "|T130653:0:2|t"; --Interface\AchievementFrame\UI-Achievement-Criteria-Check
+GU_TXTICO_END = ":0|t";
+GU_TXTICO_START = "|T";
 
 -- Event Constants
 GU_EVENT_LOGIN = "PLAYER_LOGIN";
