@@ -12,17 +12,19 @@
 
 -- Constants
 local GU_NAME = "Garry Up!";
-local GU_VERSION = " 0.2.190120";
+local GU_VERSION = " 0.2.190123";
 local GU_FRAME_W = 240;
 local GU_FRAME_H = 140;
 local GU_DEBUG = false;
-local GU_DEBUG_LEVEL = 2;
+local GU_DEBUG_LEVEL = 1;
 
 -- Variables
 local guHookWasActive = false;
 local guBaitWasActive = false;
 local guBobberWasActive = false;
 local guCurrentZone = "";
+local guAutoHideOnCombat = false;
+local guAutoShowOnFish = false;
 
 
 function GarryUp_OnLoad()
@@ -37,7 +39,9 @@ function GarryUp_OnLoad()
 	GarryUpCoreFrame:RegisterEvent(GU_EVENT_LOGIN);
 	GarryUpCoreFrame:RegisterEvent(GU_EVENT_ACHIEVEMENT);
 	GarryUpCoreFrame:RegisterEvent(GU_EVENT_MINIZONE_CHANGED);
-
+	GarryUpCoreFrame:RegisterEvent(GU_EVENT_QUEST_COMPLETE);
+	GarryUpCoreFrame:RegisterEvent(GU_EVENT_BAG_UPDATE);
+	
 	-- All done
 	GarryUp_Print("v"..GU_VERSION.." loaded. (type /gup for options)", GU_COLOR_ADDON);	
 end
@@ -110,6 +114,9 @@ function GarryUp_OnEvent(self, event, ...)
 		else
 			-- bait is off
 		end
+	elseif event == GU_EVENT_QUEST_COMPLETE or event == GU_EVENT_BAG_UPDATE then
+		--Refresh
+		GarryUp_RefreshMOM();
 	elseif event == GU_EVENT_MINIZONE_CHANGED then
 			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
 				GarryUp_Print("Subzone Changed: "..GetMinimapZoneText());
@@ -127,7 +134,7 @@ function GarryUp_OnEvent(self, event, ...)
 		end
 		
 		--check if we're in a zone first (otherwise it crashes when stoning)
-		if GarryUp_IsInDraenor() and guCurrentZone ~= GU_ZONE_GARRISON then
+		if GarryUp_IsInDraenor(true) then --and guCurrentZone ~= GU_ZONE_GARRISON then
 			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
 				GarryUp_Print("Draenor!");
 			end
@@ -176,13 +183,7 @@ end
 
 function GarryUp_OnButtonMountClick()
 	GarryUpMOMFrame:Show();
-	GarryUpMOMFrameScrollText:SetText(GarryUp_GetMOMDataBulkText());
-	
-	-- local kids = { GarryUpMOMFrameScroll:GetChildren() };
-
-	-- for _, child in ipairs(kids) do
-		-- print(child:GetName());
-	-- end
+	GarryUp_RefreshMOM();
 end
 
 function GarryUp_OnButtonGarryUpClick()
@@ -211,12 +212,16 @@ function GarryUp_SetItemButtonActive(buttonRef, active)
 	buttonRef:SetAttribute("enabled", true);
 end
 
-function GarryUp_IsInDraenor()
+function GarryUp_IsInDraenor(excludeGarrison)
 	local ret = false;
 	local zone = GetZoneText();
 	
+	--default value to false
+	excludeGarrison = excludeGarrison or false;
+	
+	
 	if zone then
-		if zone == GU_ZONE_GARRISON or 
+		if (zone == GU_ZONE_GARRISON and excludeGarrison == false) or 
 			zone == GU_ZONE_SHADOWMOON or
 			zone == GU_ZONE_TALADOR or
 			zone == GU_ZONE_NAGRAND or
@@ -372,7 +377,7 @@ function GarryUp_RefreshAngler()
 	-- Bobber
 	GarryUp_InitItemButton(GarryUpAnglerFrameBobberButton, GU_ITEM_OVERSIZED_BOBBER);
 	-- Bait
-	if GarryUp_IsInDraenor() then
+	if GarryUp_IsInDraenor(true) then
 		GarryUpAnglerFrameBaitButton:Show();
 		GarryUp_InitItemButton(GarryUpAnglerFrameBaitButton, GU_FISH_BAIT_ID[guCurrentZone]);
 	else
@@ -399,10 +404,18 @@ function GarryUp_GetDraenorDataBulkText()
 	return outText;
 end
 
+function GarryUp_RefreshMOM()
+	GarryUpMOMFrameScrollText:SetText(GarryUp_GetMOMDataBulkText());
+end
+
 function GarryUp_GetMOMDataBulkText()
 	local outText = "";
 	
 	local _, name, _, completed, _, _, _, _, _, icon = GetAchievementInfo(GU_ACH_MMOUNT_ID);
+	
+	if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
+		GarryUp_Print("MOM Icon: name:"..name.." texture:"..icon);
+	end
 	
 	outText = "|T" .. icon .. ":0|t " .. name.. "\n\n";
 	
@@ -444,6 +457,10 @@ function GarryUp_PrintHelp()
 	helpText = helpText.."/gup fish: Prints the fish you need to catch.\r";
 	helpText = helpText.."/gup draenor: Prints the acheivements you need to get.\r";
 	
+	helpText = helpText.."/gup debug: Toggle debugging.\r";
+	helpText = helpText.."/gup debug+: Increase debugging level. (give more details)\r";
+	helpText = helpText.."/gup debug+: Decrease debugging level. (give less details)\r";
+	
 	GarryUp_Print(helpText);
 end
 
@@ -455,6 +472,18 @@ function GarryUp_ToggleDebug()
 	else
 		GarryUp_Print("Debugging "..GU_COLOR_RED.."Disabled"..GU_COLOR_END);
 	end
+end
+
+function GarryUp_ChangeDebugLevel(levelDelta)
+	GU_DEBUG_LEVEL =  GU_DEBUG_LEVEL + levelDelta;
+	
+	if GU_DEBUG_LEVEL > 5 then
+		GU_DEBUG_LEVEL = 5;
+	elseif GU_DEBUG_LEVEL < 0 then
+		GU_DEBUG_LEVEL = 0;
+	end
+	
+	GarryUp_Print("Debugging Level set to: "..GU_DEBUG_LEVEL);
 end
 
 function GarryUp_SlashCommand(args, editbox)
@@ -475,6 +504,10 @@ function GarryUp_SlashCommand(args, editbox)
 		GarryUp_PrintHelp();
 	elseif args == "debug" then
 		GarryUp_ToggleDebug();
+	elseif args == "debug+" then
+		GarryUp_ChangeDebugLevel(1);		
+	elseif args == "debug-" then
+		GarryUp_ChangeDebugLevel(-1);
 	else
 		GarryUp_Print("Unknown Command '"..args.."'.");
 		GarryUp_PrintHelp();

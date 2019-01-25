@@ -27,8 +27,9 @@ GU_COLOR_PROGRESS_75 = "|cffffffff"; --white
 GU_COLOR_PROGRESS_100 = GU_COLOR_GREEN; --green
 
 -- Chat Icons
-GU_TXTICO_CHECK = "!X!";
-GU_TXTICO_END = "|t";
+GU_TXTICO_CHECK = "|T130653:0:2|t"; --Interface\AchievementFrame\UI-Achievement-Criteria-Check
+GU_TXTICO_END = ":0|t";
+GU_TXTICO_START = "|T";
 
 -- Event Constants
 GU_EVENT_LOGIN = "PLAYER_LOGIN";
@@ -37,6 +38,8 @@ GU_EVENT_BUFF_CHANGED = "UNIT_AURA";
 GU_EVENT_ZONE_CHANGED = "ZONE_CHANGED_NEW_AREA";
 GU_EVENT_ACHIEVEMENT = "ACHIEVEMENT_EARNED"
 GU_EVENT_MINIZONE_CHANGED = "ZONE_CHANGED";
+GU_EVENT_QUEST_COMPLETE = "QUEST_TURNED_IN";
+GU_EVENT_BAG_UPDATE = "BAG_UPDATE";
 
 -- Buff Constants
 GU_BUFF_HOOK = "Bladebone Hook";
@@ -53,6 +56,7 @@ GU_ZONE_GORGOND = "Gorgrond";
 GU_ZONE_FROSTFIRE = "Frostfire Ridge";
 GU_ZONE_DRAENOR_OCEAN = "Draenor Ocean"; --Not sure yet how I will handle this
 GU_MINIZONE_GARRISON_MINE = "Lunarfall Excavation";
+GU_MINIZONE_SOUTH_SEA = "The South Sea";
 
 -- Item Constants
 GU_ITEM_OVERSIZED_BOBBER = 136377;
