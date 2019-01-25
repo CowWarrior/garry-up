@@ -55,6 +55,11 @@ function GarryUp_OnMainFrameLoad()
 	GarryUpFrameMountButton:SetScale(0.75);
 end
 
+function GarryUp_OnMinerAdviserFrameLoad()
+	GarryUp_InitItemButton(GarryUpMinerAdvisorFrameCoffeeButton, GU_ITEM_MINER_COFFEE);
+	GarryUp_InitItemButton(GarryUpMinerAdvisorFramePickButton, GU_ITEM_PRESERVED_PICK);
+end
+
 function GarryUp_OnMiniFrameLoad()
 	MiniFrameGarryUpButton.icon:SetTexture(GU_TEXTURE_ID_GARRYUP);
 	MiniFrameGarryUpButton.icon:SetPoint("TOPLEFT", 0, 0);
@@ -123,7 +128,11 @@ function GarryUp_OnEvent(self, event, ...)
 			end
 			
 			if GetMinimapZoneText() == GU_MINIZONE_GARRISON_MINE then
+				GarryUp_ShowMinerAdvisor();
 				GarryUp_Print("We recommend you consume [Miner's Coffee] and [Preserved Mining Pick].");
+			else
+				--Auto-hide miner advisor
+				GarryUp_HideMinerAdvisor();
 			end
 	elseif event == GU_EVENT_ZONE_CHANGED then
 		--Zone changed check for specific zone baits and fish to catch
@@ -390,7 +399,7 @@ function GarryUp_GetDraenorDataBulkText()
 	
 	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_ANGLER_ID)..GU_ACH_ANGLER_NAME.." "..GarryUp_GetAchData(GU_ACH_ANGLER_ID)..GU_COLOR_END.."\r";
 	--outText = outText..GarryUp_GetAchProgressColor(GU_ACH_MMOUNT_ID)..GU_ACH_MMOUNT_NAME.." "..GarryUp_GetAchData(GU_ACH_MMOUNT_ID)..GU_COLOR_END.."\r";
-	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_MMOUNT_ID)..GU_ACH_MMOUNT_NAME.." "..GarryUp_GetQuestLineData(GU_QST_MOM_A)..GU_COLOR_END.."\r";
+	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_MMOUNT_ID)..GetAchievementLink(GU_ACH_MMOUNT_ID).." "..GarryUp_GetQuestLineData(GU_QST_MOM_A)..GU_COLOR_END.."\r";
 	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_RANKS_ID)..GU_ACH_RANKS_NAME.." "..GarryUp_GetAchData(GU_ACH_RANKS_ID)..GU_COLOR_END.."\r";
 	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_PETB_ID)..GU_ACH_PETB_NAME.." "..GarryUp_GetAchData(GU_ACH_PETB_ID)..GU_COLOR_END.."\r";
 	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_MONEY_ID)..GU_ACH_MONEY_NAME.." "..GarryUp_GetAchDataGold(GU_ACH_MONEY_ID)..GU_COLOR_END.."\r";
@@ -417,7 +426,7 @@ function GarryUp_GetMOMDataBulkText()
 		GarryUp_Print("MOM Icon: name:"..name.." texture:"..icon);
 	end
 	
-	outText = "|T" .. icon .. ":0|t " .. name.. "\n\n";
+	outText = "|T" .. icon .. ":0|t "..GetAchievementLink(GU_ACH_MMOUNT_ID).. "\n\n";
 	
 	outText = outText..GarryUp_GetQuestLineBulkText(GU_QST_MOM_A);
 	
@@ -431,6 +440,16 @@ end
 
 function GarryUp_RefreshDraenor()
 	GarryUpFrameText:SetText(GarryUp_GetDraenorDataBulkText());
+end
+
+function GarryUp_ShowMinerAdvisor()
+	--Texture to use for portrait: 95893
+	SetPortraitTexture(GarryUpMinerAdvisorFrame.portrait, "player")
+	GarryUpMinerAdvisorFrame:Show();
+end
+
+function GarryUp_HideMinerAdvisor()
+	GarryUpMinerAdvisorFrame:Hide();
 end
 
 function GarryUp_ResetWindow()
