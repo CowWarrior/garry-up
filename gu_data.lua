@@ -12,6 +12,9 @@
 
 --TODO: Need to reduce the number of global variables.
 
+--Global for GarryUp data
+GarryUpData = {};
+
 -- Color Constants
 GU_COLOR_ADDON = "|cffff007f";
 GU_COLOR_END = "|r";
@@ -233,58 +236,15 @@ GU_QST_MOM_H = {
 
 
 
---Zone Specific Fishing constants
-GU_FISH_RECOMMEND = {};
-GU_FISH_BAIT_BUFF = {};
-GU_FISH_BAIT_ID = {};
-GU_FISH_ACH_ID = {};
-GU_FISH_ACH_NAME = {};
-
-GU_FISH_RECOMMEND[GU_ZONE_TALADOR] = "Blackwater Whiptail";
-GU_FISH_BAIT_BUFF[GU_ZONE_TALADOR] = "Blackwater Whiptail Bait";
-GU_FISH_BAIT_ID[GU_ZONE_TALADOR] = 110294;
-GU_FISH_ACH_ID[GU_ZONE_TALADOR] = 9457;
-GU_FISH_ACH_NAME[GU_ZONE_TALADOR] = "Blackwater Whiptail Angler";
-
-GU_FISH_RECOMMEND[GU_ZONE_SHADOWMOON] = "Blind Lake Sturgeon";
-GU_FISH_BAIT_BUFF[GU_ZONE_SHADOWMOON] = "Blind Lake Sturgeon Bait";
-GU_FISH_BAIT_ID[GU_ZONE_SHADOWMOON] = 110290;
-GU_FISH_ACH_ID[GU_ZONE_SHADOWMOON] = 9458;
-GU_FISH_ACH_NAME[GU_ZONE_SHADOWMOON] = "Blind Lake Sturgeon Angler";
-
-GU_FISH_RECOMMEND[GU_ZONE_NAGRAND] = "Fat Sleepers";
-GU_FISH_BAIT_BUFF[GU_ZONE_NAGRAND] = "Fat Sleeper Bait";
-GU_FISH_BAIT_ID[GU_ZONE_NAGRAND] = 110289;
-GU_FISH_ACH_ID[GU_ZONE_NAGRAND] = 9459;
-GU_FISH_ACH_NAME[GU_ZONE_NAGRAND] = "Fat Sleeper Angler";
-
-GU_FISH_RECOMMEND[GU_ZONE_ARAK] = "Abyssal Gulper Eel";
-GU_FISH_BAIT_BUFF[GU_ZONE_ARAK] = "Abyssal Gulper Eel Bait";
-GU_FISH_BAIT_ID[GU_ZONE_ARAK] = 110293;
-GU_FISH_ACH_ID[GU_ZONE_ARAK] = 9456;
-GU_FISH_ACH_NAME[GU_ZONE_ARAK] = "Abyssal Gulper Angler";
-
-GU_FISH_RECOMMEND[GU_ZONE_GORGOND] = "Jawless Skulker";
-GU_FISH_BAIT_BUFF[GU_ZONE_GORGOND] = "Jawless Skulker Bait";
-GU_FISH_BAIT_ID[GU_ZONE_GORGOND] = 110274;
-GU_FISH_ACH_ID[GU_ZONE_GORGOND] = 9460;
-GU_FISH_ACH_NAME[GU_ZONE_GORGOND] = "Jawless Skulker Angler";
-
-GU_FISH_RECOMMEND[GU_ZONE_FROSTFIRE] = "Fire Ammonite";
-GU_FISH_BAIT_BUFF[GU_ZONE_FROSTFIRE] = "Fire Ammonite Bait";
-GU_FISH_BAIT_ID[GU_ZONE_FROSTFIRE] = 110291;
-GU_FISH_ACH_ID[GU_ZONE_FROSTFIRE] = 9455;
-GU_FISH_ACH_NAME[GU_ZONE_FROSTFIRE] = "Fire Ammonite Angler";
-
-GU_FISH_RECOMMEND[GU_ZONE_DRAENOR_OCEAN] = "Sea Scorpion";
-GU_FISH_BAIT_BUFF[GU_ZONE_DRAENOR_OCEAN] = "Sea Scorpion Bait";
-GU_FISH_BAIT_ID[GU_ZONE_DRAENOR_OCEAN] = 110292;
-GU_FISH_ACH_ID[GU_ZONE_DRAENOR_OCEAN] = 9461;
-GU_FISH_ACH_NAME[GU_ZONE_DRAENOR_OCEAN] = "Sea Scorpion Angler";
-
-GU_FISH_RECOMMEND[GU_ZONE_GARRISON] = "anything, as long as you have a proper bait";
-GU_FISH_BAIT_BUFF[GU_ZONE_GARRISON] = "Any Bait";
-GU_FISH_BAIT_ID[GU_ZONE_GARRISON] = 0;
-GU_FISH_ACH_ID[GU_ZONE_GARRISON] = 9462;
-GU_FISH_ACH_NAME[GU_ZONE_GARRISON] = "Draenor Angler";
+--Fishing constants (Draenor Angler)
+GarryUpData["Angler"] = {
+	{AchId = 9462, BaitId = 0, FishName = "anything, as long as you have a proper bait", Zone = GU_ZONE_GARRISON, Skip = true},
+	{AchId = 9455, BaitId = 110291, FishName = "Fire Ammonite", Zone = GU_ZONE_FROSTFIRE},
+	{AchId = 9456, BaitId = 110293, FishName = "Abyssal Gulper Eel", Zone = GU_ZONE_ARAK},
+	{AchId = 9457, BaitId = 110294, FishName = "Blackwater Whiptail", Zone = GU_ZONE_TALADOR},
+	{AchId = 9458, BaitId = 110290, FishName = "Blind Lake Sturgeon", Zone = GU_ZONE_SHADOWMOON},
+	{AchId = 9459, BaitId = 110289, FishName = "Fat Sleepers", Zone = GU_ZONE_NAGRAND},
+	{AchId = 9460, BaitId = 110274, FishName = "Jawless Skulker", Zone = GU_ZONE_GORGOND},
+	{AchId = 9461, BaitId = 110292, FishName = "Sea Scorpion", Zone = GU_ZONE_DRAENOR_OCEAN}
+}
 

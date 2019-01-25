@@ -95,56 +95,21 @@
     </Frames>
 </Frame>
 
-<Frame name="GarryUpNPCFrameTemplateX" virtual="true" toplevel="true" frameStrata="LOW" movable="true" enableMouse="true" hidden="true" parent="UIParent" clampedToScreen="true" >
+<Frame name="GarryUpNPCFrameTemplate" virtual="true" movable="true" clampedToScreen="true" hidden="true" inherits="PortraitFrameTemplate" >
+	<Scripts>
+		<OnMouseDown>
+		  if (button == "LeftButton") then
+			self:StartMoving()
+		  end
+		</OnMouseDown>
+		<OnMouseUp>
+		  self:StopMovingOrSizing()
+		</OnMouseUp>
+	</Scripts>
 	<Size>
-		<AbsDimension x="240" y="100"/>
+		<AbsDimension x="240" y="170"/>
 	</Size>
-	<Anchors><Anchor point="TOP"><Offset><AbsDimension x="0" y="0" /></Offset></Anchor></Anchors>
-	<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" tile="true">
-		<BackgroundInsets>
-			<AbsInset left="5" right="5" top="5" bottom="5"/>
-		</BackgroundInsets>
-		<TileSize>
-			<AbsValue val="16"/>
-		</TileSize>
-	</Backdrop>
-	<Layers>
-      <Layer level="OVERLAY">
-          <FontString name="$parentTitle" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP" text="Garry Up!">
-              <Anchors>
-                  <Anchor point="TOP">
-                      <Offset>
-                          <AbsDimension x="5" y="-8" />
-                      </Offset>
-                  </Anchor>
-              </Anchors>
-          </FontString>
-          <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP" text="">
-              <Anchors>
-                  <Anchor point="TOPLEFT">
-                      <Offset>
-                          <AbsDimension x="5" y="-28" />
-                      </Offset>
-                  </Anchor>
-              </Anchors>
-          </FontString>
-      </Layer>
-	</Layers>
-	<Frames>
-		<Button name="$parentTinyCloseButton" hidden="false" inherits="UIPanelCloseButton">
-			<Anchors><Anchor point="TOPRIGHT"><Offset><AbsDimension x="0" y="0" /></Offset></Anchor></Anchors>
-		</Button>
-	</Frames>
-</Frame>
-
-
-
-<Frame name="GarryUpNPCFrameTemplate" virtual="true" clampedToScreen="true" hidden="true" inherits="PortraitFrameTemplate" >
-	<Size>
-		<AbsDimension x="240" y="100"/>
-	</Size>
-	<Anchors><Anchor point="TOP"><Offset><AbsDimension x="0" y="0" /></Offset></Anchor></Anchors>
-
+	<Anchors><Anchor point="TOP"><Offset><AbsDimension x="0" y="-10" /></Offset></Anchor></Anchors>
 	<Layers>
       <Layer level="OVERLAY">
           <FontString name="$parentTitle" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP" text="Garry Up!">
@@ -160,7 +125,7 @@
               <Anchors>
                   <Anchor point="TOPLEFT">
                       <Offset>
-                          <AbsDimension x="5" y="-28" />
+                          <AbsDimension x="5" y="-58" />
                       </Offset>
                   </Anchor>
               </Anchors>
@@ -285,7 +250,8 @@
 	<Scripts>
 		<OnLoad>
 			GarryUp_OnMinerAdviserFrameLoad();
-			GarryUpMinerAdvisorFrameTitle:SetText("Miner Adviser");
+			GarryUpMinerAdvisorFrameTitle:SetText("Miner Advisor");
+			GarryUpMinerAdvisorFrameText:SetText("I should get a coffee, or three...");
 		</OnLoad>
 	</Scripts>
 	<Anchors><Anchor point="CENTER"><Offset><AbsDimension x="0" y="0" /></Offset></Anchor></Anchors>

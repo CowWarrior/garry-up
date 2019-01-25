@@ -4,7 +4,7 @@
 ## Author: CowWarrior
 ## eMail: 
 ## URL: https://
-## Version: 0.2.190123
+## Version: 0.2.190125
 ## LoadOnDemand: 0
 ## DefaultState: enabled
 ## SavedVariables:

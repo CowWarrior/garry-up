@@ -4,7 +4,7 @@
 -- *
 -- * Created by: CowWarrior
 -- * Created on: 2019-01-11
--- * Updated on: 2019-01-20
+-- * Updated on: 2019-01-25
 -- * 
 -- * Tested on : WOW 8.1
 -- *
@@ -12,7 +12,7 @@
 
 -- Constants
 local GU_NAME = "Garry Up!";
-local GU_VERSION = " 0.2.190123";
+local GU_VERSION = " 0.2.190125";
 local GU_FRAME_W = 240;
 local GU_FRAME_H = 140;
 local GU_DEBUG = false;
@@ -108,14 +108,14 @@ function GarryUp_OnEvent(self, event, ...)
 			-- hook is off
 		end
 		
-		if GarryUp_CheckBuff(GU_FISH_BAIT_BUFF[guCurrentZone]) then
+		if GarryUp_CheckBuff(GarryUp_GetBaitBuff(guCurrentZone)) then
 			-- we got bait
 			guBaitWasActive = true;
 		elseif guBaitWasActive then
 			-- we lost bait
 			PlaySound(GU_SOUND_QUEST_LOG_ABANDON_QUEST);
 			guBaitWasActive = false;
-			GarryUp_Print("You need to reapply "..GU_FISH_BAIT_BUFF[guCurrentZone].."!", GU_COLOR_RED);
+			GarryUp_Print("You need to reapply "..GarryUp_GetBaitBuff(guCurrentZone).."!", GU_COLOR_RED);
 		else
 			-- bait is off
 		end
@@ -142,22 +142,7 @@ function GarryUp_OnEvent(self, event, ...)
 			GarryUp_Print("New zone: "..guCurrentZone);
 		end
 		
-		--check if we're in a zone first (otherwise it crashes when stoning)
-		if GarryUp_IsInDraenor(true) then --and guCurrentZone ~= GU_ZONE_GARRISON then
-			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-				GarryUp_Print("Draenor!");
-			end
-			
-			GarryUp_Print("We recommend you fish for "..GU_COLOR_GREEN..GU_FISH_RECOMMEND[guCurrentZone]..GU_COLOR_END.."!");
-			GarryUpAnglerFrameBaitButton:Show();
-			GarryUp_InitItemButton(GarryUpAnglerFrameBaitButton, GU_FISH_BAIT_ID[guCurrentZone]);
-		else
-			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-				GarryUp_Print("Not in Draenor...");
-			end
-			-- We're not in Draenor anymore!
-			GarryUpAnglerFrameBaitButton:Hide();
-		end
+		GarryUp_RecommendAngler(guCurrentZone);
 	elseif event == GU_EVENT_LOGIN then
 		--Initial world data is now available
 		
@@ -362,15 +347,87 @@ end
 function GarryUp_GetAnglerDataBulkText()
 	local outText = "";
 	
-	outText = outText..GarryUp_GetAchProgressColor(GU_FISH_ACH_ID[GU_ZONE_DRAENOR_OCEAN])..GU_FISH_ACH_NAME[GU_ZONE_DRAENOR_OCEAN]..": "..GarryUp_GetAchData(GU_FISH_ACH_ID[GU_ZONE_DRAENOR_OCEAN])..GU_COLOR_END.."\r";
-	outText = outText..GarryUp_GetAchProgressColor(GU_FISH_ACH_ID[GU_ZONE_NAGRAND])..GU_FISH_ACH_NAME[GU_ZONE_NAGRAND]..": "..GarryUp_GetAchData(GU_FISH_ACH_ID[GU_ZONE_NAGRAND])..GU_COLOR_END.."\r";
-	outText = outText..GarryUp_GetAchProgressColor(GU_FISH_ACH_ID[GU_ZONE_TALADOR])..GU_FISH_ACH_NAME[GU_ZONE_TALADOR]..": "..GarryUp_GetAchData(GU_FISH_ACH_ID[GU_ZONE_TALADOR])..GU_COLOR_END.."\r";
-	outText = outText..GarryUp_GetAchProgressColor(GU_FISH_ACH_ID[GU_ZONE_FROSTFIRE])..GU_FISH_ACH_NAME[GU_ZONE_FROSTFIRE]..": "..GarryUp_GetAchData(GU_FISH_ACH_ID[GU_ZONE_FROSTFIRE])..GU_COLOR_END.."\r";
-	outText = outText..GarryUp_GetAchProgressColor(GU_FISH_ACH_ID[GU_ZONE_GORGOND])..GU_FISH_ACH_NAME[GU_ZONE_GORGOND]..": "..GarryUp_GetAchData(GU_FISH_ACH_ID[GU_ZONE_GORGOND])..GU_COLOR_END.."\r";
-	outText = outText..GarryUp_GetAchProgressColor(GU_FISH_ACH_ID[GU_ZONE_SHADOWMOON])..GU_FISH_ACH_NAME[GU_ZONE_SHADOWMOON]..": "..GarryUp_GetAchData(GU_FISH_ACH_ID[GU_ZONE_SHADOWMOON])..GU_COLOR_END.."\r";
-	outText = outText..GarryUp_GetAchProgressColor(GU_FISH_ACH_ID[GU_ZONE_ARAK])..GU_FISH_ACH_NAME[GU_ZONE_ARAK]..": "..GarryUp_GetAchData(GU_FISH_ACH_ID[GU_ZONE_ARAK])..GU_COLOR_END.."\r";
+	for key, _ in ipairs(GarryUpData.Angler) do
+		if not GarryUpData.Angler[key].Skip then
+			local id, name, _, completed, _, _, _, _, _, icon = GetAchievementInfo(GarryUpData.Angler[key].AchId);
+			
+			outText = outText..GU_TXTICO_START..icon..GU_TXTICO_END..GarryUp_GetAchProgressColor(id)..name;
+			
+			if completed then
+				outText = outText.." "..GU_COLOR_END..GU_TXTICO_CHECK.."\r";
+			else
+				outText = outText.." ("..GarryUp_GetAchData(id)..")"..GU_COLOR_END.."\r";
+			end	
+		end
+	end
 	
 	return outText;
+end
+
+function GarryUp_GetAnglerData()
+	local completeCount, totalCount = 0, 0;
+	
+	for key, _ in ipairs(GarryUpData.Angler) do
+		if not GarryUpData.Angler[key].Skip then
+			local id, name, _, completed, _, _, _, _, _, icon = GetAchievementInfo(GarryUpData.Angler[key].AchId);
+			
+			totalCount = totalCount + 1;
+			
+			if completed then
+				completeCount = completeCount + 1;
+			end	
+		end
+	end
+	
+	return completeCount.."/"..totalCount;
+end
+
+function GarryUp_RecommendAngler(targetZone)
+	--check if we're in a zone first (otherwise it crashes when stoning)
+	if GarryUp_IsInDraenor(true) then --and guCurrentZone ~= GU_ZONE_GARRISON then
+		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
+			GarryUp_Print("Draenor!");
+		end
+		
+		for key, _ in ipairs(GarryUpData.Angler) do
+			if GarryUpData.Angler[key].Zone == targetZone then
+				GarryUp_Print("We recommend you fish for "..GU_COLOR_GREEN..GarryUpData.Angler[key].FishName..GU_COLOR_END.."!");
+				GarryUpAnglerFrameBaitButton:Show();
+				GarryUp_InitItemButton(GarryUpAnglerFrameBaitButton, GarryUpData.Angler[key].BaitId);
+			end
+		end			
+	else
+		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
+			GarryUp_Print("Not in Draenor...");
+		end
+		-- We're not in Draenor anymore!
+		GarryUpAnglerFrameBaitButton:Hide();
+	end
+end
+
+function GarryUp_GetBaitBuff(targetZone)
+	local baitId = GarryUp_GetBait(targetZone);	
+	
+	if baitId then
+		--The buff is equal to the item name in this case
+		return GetItemInfo(baitId);
+	end
+	
+	return nil;
+end
+
+function GarryUp_GetBait(targetZone)
+	--check if we're in a zone first (there are no baits outside Draenor)
+	if GarryUp_IsInDraenor(true) then
+		for key, _ in ipairs(GarryUpData.Angler) do
+			if GarryUpData.Angler[key].Zone == targetZone then
+				return GarryUpData.Angler[key].BaitId;
+			end
+		end			
+	end
+	
+	--no bait found
+	return nil;
 end
 
 function GarryUp_ShowAngler()
@@ -388,7 +445,7 @@ function GarryUp_RefreshAngler()
 	-- Bait
 	if GarryUp_IsInDraenor(true) then
 		GarryUpAnglerFrameBaitButton:Show();
-		GarryUp_InitItemButton(GarryUpAnglerFrameBaitButton, GU_FISH_BAIT_ID[guCurrentZone]);
+		GarryUp_InitItemButton(GarryUpAnglerFrameBaitButton, GarryUp_GetBait(guCurrentZone));
 	else
 		GarryUpAnglerFrameBaitButton:Hide();
 	end
@@ -397,7 +454,7 @@ end
 function GarryUp_GetDraenorDataBulkText()
 	local outText = "";
 	
-	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_ANGLER_ID)..GU_ACH_ANGLER_NAME.." "..GarryUp_GetAchData(GU_ACH_ANGLER_ID)..GU_COLOR_END.."\r";
+	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_ANGLER_ID)..GU_ACH_ANGLER_NAME.." "..GarryUp_GetAnglerData()..GU_COLOR_END.."\r";
 	--outText = outText..GarryUp_GetAchProgressColor(GU_ACH_MMOUNT_ID)..GU_ACH_MMOUNT_NAME.." "..GarryUp_GetAchData(GU_ACH_MMOUNT_ID)..GU_COLOR_END.."\r";
 	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_MMOUNT_ID)..GetAchievementLink(GU_ACH_MMOUNT_ID).." "..GarryUp_GetQuestLineData(GU_QST_MOM_A)..GU_COLOR_END.."\r";
 	outText = outText..GarryUp_GetAchProgressColor(GU_ACH_RANKS_ID)..GU_ACH_RANKS_NAME.." "..GarryUp_GetAchData(GU_ACH_RANKS_ID)..GU_COLOR_END.."\r";
@@ -426,7 +483,7 @@ function GarryUp_GetMOMDataBulkText()
 		GarryUp_Print("MOM Icon: name:"..name.." texture:"..icon);
 	end
 	
-	outText = "|T" .. icon .. ":0|t "..GetAchievementLink(GU_ACH_MMOUNT_ID).. "\n\n";
+	outText = GU_TXTICO_START .. icon .. GU_TXTICO_END..GetAchievementLink(GU_ACH_MMOUNT_ID).. "\n\n";
 	
 	outText = outText..GarryUp_GetQuestLineBulkText(GU_QST_MOM_A);
 	
