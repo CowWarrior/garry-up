@@ -3,8 +3,8 @@
 ## Notes: This add-on helps you level your garrison buildings.
 ## Author: CowWarrior
 ## eMail: 
-## URL: https://
-## Version: 0.2.190125
+## URL: https://wow.curseforge.com/projects/garry-up
+## Version: 0.3.225340
 ## LoadOnDemand: 0
 ## DefaultState: enabled
 ## SavedVariables:

@@ -191,7 +191,7 @@
 		<OnLoad>GarryUp_OnMainFrameLoad()</OnLoad>
 	</Scripts>
 	<Size>
-		<AbsDimension x="240" y="175"/>
+		<AbsDimension x="240" y="300"/>
 	</Size>
 	<Frames>
 		<Button name="$parentTinyCloseButton" hidden="false" inherits="UIPanelCloseButton">

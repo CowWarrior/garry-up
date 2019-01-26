@@ -1,110 +1,109 @@
+local _, garryup = ...
+
 -- *****************************************************************************
 -- *
 -- *                            GarryUp! Data
 -- *
 -- * Created by: CowWarrior
 -- * Created on: 2019-01-19
--- * Updated on: 2019-01-19
+-- * Updated on: 2019-01-26
 -- * 
 -- * Tested on : WOW 8.1
+-- *
+-- * This module holds the data and constants for the add-on.
 -- *
 -- *****************************************************************************
 
 --TODO: Need to reduce the number of global variables.
 
 --Global for GarryUp data
-GarryUpData = {};
+GarryUpData = {
+	-- Color Constants
+	COLOR_ADDON = "|cffff007f",
+	COLOR_END = "|r",
+	COLOR_RED = "|cffff0000",
+	COLOR_GREEN = "|cff00ff00",
+	COLOR_BLUE = "|cff0000ff",
+	COLOR_WHITE = "|cffffffff",
+	COLOR_BLACK = "|cff000000",
+	COLOR_PROGRESS_0 = "|cff7d7d7d", --grey
+	COLOR_PROGRESS_25 = "|cff7d7d00", --dark yellow
+	COLOR_PROGRESS_50 = "|cffffd100", --brighter yellow
+	COLOR_PROGRESS_75 = "|cffffffff", --white
+	COLOR_PROGRESS_100 = "|cff00ff00", --green
 
--- Color Constants
-GU_COLOR_ADDON = "|cffff007f";
-GU_COLOR_END = "|r";
-GU_COLOR_RED = "|cffff0000";
-GU_COLOR_GREEN = "|cff00ff00";
-GU_COLOR_BLUE = "|cff0000ff";
-GU_COLOR_WHITE = "|cffffffff";
-GU_COLOR_BLACK = "|cff000000";
-GU_COLOR_PROGRESS_0 = "|cff7d7d7d"; --grey
-GU_COLOR_PROGRESS_25 = "|cff7d7d00"; --dark yellow
-GU_COLOR_PROGRESS_50 = "|cffffd100"; --brighter yellow
-GU_COLOR_PROGRESS_75 = "|cffffffff"; --white
-GU_COLOR_PROGRESS_100 = GU_COLOR_GREEN; --green
+	-- Chat Icons
+	TXTICO_CHECK = "|T130653:0:2|t", --Interface\AchievementFrame\UI-Achievement-Criteria-Check
+	TXTICO_END = ":0|t",
+	TXTICO_START = "|T",
 
--- Chat Icons
-GU_TXTICO_CHECK = "|T130653:0:2|t"; --Interface\AchievementFrame\UI-Achievement-Criteria-Check
-GU_TXTICO_END = ":0|t";
-GU_TXTICO_START = "|T";
+	-- Event Constants
+	EVENT_LOGIN = "PLAYER_LOGIN",
+	EVENT_LOOT = "CHAT_MSG_LOOT",
+	EVENT_BUFF_CHANGED = "UNIT_AURA",
+	EVENT_ZONE_CHANGED = "ZONE_CHANGED_NEW_AREA",
+	EVENT_ACHIEVEMENT = "ACHIEVEMENT_EARNED",
+	EVENT_MINIZONE_CHANGED = "ZONE_CHANGED",
+	EVENT_QUEST_COMPLETE = "QUEST_TURNED_IN",
+	EVENT_BAG_UPDATE = "BAG_UPDATE",
 
--- Event Constants
-GU_EVENT_LOGIN = "PLAYER_LOGIN";
-GU_EVENT_LOOT = "CHAT_MSG_LOOT";
-GU_EVENT_BUFF_CHANGED = "UNIT_AURA";
-GU_EVENT_ZONE_CHANGED = "ZONE_CHANGED_NEW_AREA";
-GU_EVENT_ACHIEVEMENT = "ACHIEVEMENT_EARNED"
-GU_EVENT_MINIZONE_CHANGED = "ZONE_CHANGED";
-GU_EVENT_QUEST_COMPLETE = "QUEST_TURNED_IN";
-GU_EVENT_BAG_UPDATE = "BAG_UPDATE";
+	-- Buff Constants
+	BUFF_HOOK = "Bladebone Hook",
+	BUFF_BOBBER = "Oversized Bobber",
+	BUFF_SKULKER = "Jawless Skulker Bait",
 
--- Buff Constants
-GU_BUFF_HOOK = "Bladebone Hook";
-GU_BUFF_BOBBER = "Oversized Bobber";
-GU_BUFF_SKULKER = "Jawless Skulker Bait";
+	-- Zone Constants
+	ZONE_GARRISON = "Lunarfall",
+	ZONE_SHADOWMOON = "Shadowmoon Valley",
+	ZONE_TALADOR = "Talador",
+	ZONE_NAGRAND = "Nagrand",
+	ZONE_ARAK = "Spires of Arak",
+	ZONE_GORGOND = "Gorgrond",
+	ZONE_FROSTFIRE = "Frostfire Ridge",
+	ZONE_DRAENOR_OCEAN = "Draenor Ocean", --Not sure yet how I will handle this
+	MINIZONE_GARRISON_MINE = "Lunarfall Excavation",
+	MINIZONE_SOUTH_SEA = "The South Sea",
 
--- Zone Constants
-GU_ZONE_GARRISON = "Lunarfall";
-GU_ZONE_SHADOWMOON = "Shadowmoon Valley";
-GU_ZONE_TALADOR = "Talador";
-GU_ZONE_NAGRAND = "Nagrand";
-GU_ZONE_ARAK = "Spires of Arak";
-GU_ZONE_GORGOND = "Gorgrond";
-GU_ZONE_FROSTFIRE = "Frostfire Ridge";
-GU_ZONE_DRAENOR_OCEAN = "Draenor Ocean"; --Not sure yet how I will handle this
-GU_MINIZONE_GARRISON_MINE = "Lunarfall Excavation";
-GU_MINIZONE_SOUTH_SEA = "The South Sea";
+	-- Item Constants
+	ITEM_OVERSIZED_BOBBER = 136377,
+	ITEM_BLADEBONE_HOOK = 122742,
+	ITEM_MINER_COFFEE = 118897,
+	ITEM_PRESERVED_PICK = 118903,
 
--- Item Constants
-GU_ITEM_OVERSIZED_BOBBER = 136377;
-GU_ITEM_BLADEBONE_HOOK = 122742;
-GU_ITEM_MINER_COFFEE = 118897;
-GU_ITEM_PRESERVED_PICK = 118903;
+	-- Texture constants
+	TEXTURE_ID_FISHING = 136245,
+	TEXTURE_ID_MOUNT = 975744, --631718;
+	TEXTURE_ID_GARRYUP = 1005027,
 
--- Texture constants
-GU_TEXTURE_ID_FISHING = 136245;
-GU_TEXTURE_ID_MOUNT = 975744; --631718;
-GU_TEXTURE_ID_GARRYUP = 1005027;
+	-- Sound Constants
+	SOUND_QUEST_LOG_ABANDON_QUEST = 846
+}
 
--- Sound Constants
-GU_SOUND_QUEST_LOG_ABANDON_QUEST = 846;
-
--- Achievements constants
-GU_ACH_ANGLER_ID = 9462;
-GU_ACH_ANGLER_NAME = "Draenor Angler";
-GU_ACH_MONEY_ID = 9487;
-GU_ACH_MONEY_NAME = "Draenor Money"; --Got My Mind On My Draenor Money
-GU_ACH_MMOUNT_ID = 9526;
-GU_ACH_MMOUNT_NAME = "Master of Mounts"; -- Intro to Husbandry is the pre-requisite acheivement
-GU_ACH_RANKS_ID = 9129;
-GU_ACH_RANKS_NAME = "Filling the Ranks";
-GU_ACH_PETB_ID = 9463;
-GU_ACH_PETB_NAME = "Draenic Pet Battler";
-GU_ACH_SAVAGEH_ID = 9477;
-GU_ACH_SAVAGEH_NAME = "Savage Friends (horde)";
-GU_ACH_SAVAGEA_ID = 9478;
-GU_ACH_SAVAGEA_NAME = "Savage Friends (alliance)";
-GU_ACH_MTH_ID = 10348; --9726  --10348;
-GU_ACH_MTH_NAME = "Master Treasure Hunter";
-
-GU_ACH_SALVAGING_ID = 9468;
-GU_ACH_SALVAGING_NAME = "Salvaging Pays Off";
-GU_ACH_TRAPPER_ID = 9565;
-GU_ACH_TRAPPER_NAME = "Master Trapper";
-
+GarryUpData["BuildingsLv3"] = {
+	{AchId=9462, AchType="AchLine"},
+	{AchId=9487, AchType="Gold"},
+	{AchId=9526, AchType="QuestLine"},
+	{AchId=9129},
+	{AchId=9463},
+	{AchId=9477, FactionGroup="Horde"},
+	{AchId=9478, FactionGroup="Alliance"},
+	{AchId=10348},
+	{AchId=9468},
+	{AchId=9406},
+	{AchId=9565},
+	{AchId=9495},
+	{AchId=9523},
+	{AchId=9497},
+	{AchId=9527},
+	{AchId=9454},
+	{AchId=9453},
+	{AchId=9429},
+	{AchId=9703}
+}
 
 -- QuestLines
-
---TODO: Convert into generic variable (constant) name and have Horde/Alliance specific data loaded into it OnLoad
---      if UnitFactionGroup("player") == "Alliance" then
-GU_QST_MOM_A = {}
-GU_QST_MOM_A = {
+GarryUpData["QST_MOM"] = {AchId=9526};
+GarryUpData.QST_MOM["Alliance"] = {
 	{ID = 37028, NAME = "Wolf Training: The Garn", DEPTH = 1},
 	{ID = 37027, NAME = "Wolf Training: Orc Hunters", DEPTH = 2},
 	{ID = 37026, NAME = "Wolf Training: Ironbore", DEPTH = 2},
@@ -169,8 +168,7 @@ GU_QST_MOM_A = {
 	
 }
 
-GU_QST_MOM_H = {}
-GU_QST_MOM_H = {
+GarryUpData.QST_MOM["Horde"] = {
 	{ID = 37111, NAME = "Wolf Training: The Garn", DEPTH = 1},
 	{ID = 37110, NAME = "Wolf Training: Orc Hunters", DEPTH = 2},
 	{ID = 37109, NAME = "Wolf Training: Ironbore", DEPTH = 2},
