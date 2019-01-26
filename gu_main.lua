@@ -33,7 +33,6 @@ local _, garryup = ...
 GarryUp = garryup; -- Make local code available globally
 
 -- Constants
-local         NAME = "Garry Up!";
 local GU_FRAME_W = 240;
 local GU_FRAME_H = 140;
 local GU_DEBUG = false;
@@ -50,10 +49,10 @@ local guPlayerFaction = ""
 local guFullyLoaded = false;
 
 
-function GarryUp_OnLoad()
+function garryup.OnLoad()
 	-- Register Slash commands
 	SLASH_GarryUp1 = "/gup"
-	SlashCmdList["GarryUp"] = GarryUp_SlashCommand;
+	SlashCmdList["GarryUp"] = garryup.SlashCommand;
 
 	-- Resgister Events
 	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_BUFF_CHANGED);
@@ -66,10 +65,10 @@ function GarryUp_OnLoad()
 	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_BAG_UPDATE);
 	
 	-- All done
-	GarryUp_Print("v"..GetAddOnMetadata("GarryUp","Version").." loaded. (type /gup for options)", GarryUpData.COLOR_ADDON);	
+	garryup.Print("v"..GetAddOnMetadata("GarryUp","Version").." loaded. (type /gup for options)", GarryUpData.COLOR_ADDON);	
 end
 
-function GarryUp_OnMainFrameLoad()
+function garryup.OnMainFrameLoad()
 	--this is silly, this should be static XML....
 	GarryUpFrameFishButton.icon:SetTexture(GarryUpData.TEXTURE_ID_FISHING);
 	GarryUpFrameFishButton:SetScale(0.75);
@@ -78,147 +77,147 @@ function GarryUp_OnMainFrameLoad()
 	GarryUpFrameMountButton:SetScale(0.75);
 end
 
-function GarryUp_OnMinerAdviserFrameLoad()
-	GarryUp_InitItemButton(GarryUpMinerAdvisorFrameCoffeeButton, GarryUpData.ITEM_MINER_COFFEE);
-	GarryUp_InitItemButton(GarryUpMinerAdvisorFramePickButton, GarryUpData.ITEM_PRESERVED_PICK);
+function garryup.OnMinerAdviserFrameLoad()
+	garryup.InitItemButton(GarryUpMinerAdvisorFrameCoffeeButton, GarryUpData.ITEM_MINER_COFFEE);
+	garryup.InitItemButton(GarryUpMinerAdvisorFramePickButton, GarryUpData.ITEM_PRESERVED_PICK);
 end
 
-function GarryUp_OnMiniFrameLoad()
+function garryup.OnMiniFrameLoad()
 	MiniFrameGarryUpButton.icon:SetTexture(GarryUpData.TEXTURE_ID_GARRYUP);
 	MiniFrameGarryUpButton.icon:SetPoint("TOPLEFT", 0, 0);
 end
 
-function GarryUp_OnEvent(self, event, ...)
+function garryup.OnEvent(self, event, ...)
 	if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-		GarryUp_Print("Event:"..event);
+		garryup.Print("Event:"..event);
 	end
 	
 	if event == GarryUpData.EVENT_LOOT then
-		GarryUp_RefreshAngler();
+		garryup.RefreshAngler();
 	elseif event == GarryUpData.EVENT_BUFF_CHANGED then
 		--Check for bait/hook for current zone
 		
 		if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
-			GarryUp_Print("BaitWasActive? "..GarryUp_BoolToString(guBaitWasActive));
-			GarryUp_Print("HookWasActive? "..GarryUp_BoolToString(guHookWasActive));
-			GarryUp_Print("BobberWasActive? "..GarryUp_BoolToString(guBobberWasActive));
-			GarryUp_Print("Active buffs:\r"..GarryUp_EnumerateAllBuff());
+			garryup.Print("BaitWasActive? "..garryup.BoolToString(guBaitWasActive));
+			garryup.Print("HookWasActive? "..garryup.BoolToString(guHookWasActive));
+			garryup.Print("BobberWasActive? "..garryup.BoolToString(guBobberWasActive));
+			garryup.Print("Active buffs:\r"..garryup.EnumerateAllBuff());
 		end		
 		
-		if GarryUp_CheckBuff(GarryUpData.BUFF_BOBBER) then
+		if garryup.CheckBuff(GarryUpData.BUFF_BOBBER) then
 			-- we got bobber
 			guBobberWasActive = true;
 		elseif guBobberWasActive then
 			-- we lost bobber
 			PlaySound(GarryUpData.SOUND_QUEST_LOG_ABANDON_QUEST);
 			guBobberWasActive = false;
-			GarryUp_Print("You need to reapply your "..GarryUpData.BUFF_BOBBER.."!", GarryUpData.COLOR_RED);
+			garryup.Print("You need to reapply your "..GarryUpData.BUFF_BOBBER.."!", GarryUpData.COLOR_RED);
 		else
 			-- bobber is off
 		end
 		-- update button state
-		GarryUp_SetItemButtonActive(GarryUpAnglerFrameBobberButton, not guBobberWasActive)
+		garryup.SetItemButtonActive(GarryUpAnglerFrameBobberButton, not guBobberWasActive)
 
-		if GarryUp_CheckBuff(GarryUpData.BUFF_HOOK) then
+		if garryup.CheckBuff(GarryUpData.BUFF_HOOK) then
 			-- we got hook
 			guHookWasActive = true;
 		elseif guHookWasActive then
 			-- we lost hook
 			PlaySound(GarryUpData.SOUND_QUEST_LOG_ABANDON_QUEST);
 			guHookWasActive = false;
-			GarryUp_Print("You need to reapply your "..GarryUpData.BUFF_HOOK.."!", GarryUpData.COLOR_RED);
+			garryup.Print("You need to reapply your "..GarryUpData.BUFF_HOOK.."!", GarryUpData.COLOR_RED);
 		else
 			-- hook is off
 		end
 		
-		if GarryUp_CheckBuff(GarryUp_GetBaitBuff(guCurrentZone)) then
+		if garryup.CheckBuff(garryup.GetBaitBuff(guCurrentZone)) then
 			-- we got bait
 			guBaitWasActive = true;
 		elseif guBaitWasActive then
 			-- we lost bait
 			PlaySound(GarryUpData.SOUND_QUEST_LOG_ABANDON_QUEST);
 			guBaitWasActive = false;
-			GarryUp_Print("You need to reapply "..GarryUp_GetBaitBuff(guCurrentZone).."!", GarryUpData.COLOR_RED);
+			garryup.Print("You need to reapply "..garryup.GetBaitBuff(guCurrentZone).."!", GarryUpData.COLOR_RED);
 		else
 			-- bait is off
 		end
 	elseif event == GarryUpData.EVENT_QUEST_COMPLETE then
 		--Refresh
-		GarryUp_RefreshMOM();
+		garryup.RefreshMOM();
 	elseif event == GarryUpData.EVENT_BAG_UPDATE then
 		--Refresh Salvage
 		--Already cought in refresh below. No need to refresh here
 	elseif event == GarryUpData.EVENT_MINIZONE_CHANGED then
 			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-				GarryUp_Print("Subzone Changed: "..GetMinimapZoneText());
+				garryup.Print("Subzone Changed: "..GetMinimapZoneText());
 			end
 			
 			if GetMinimapZoneText() == GarryUpData.MINIZONE_GARRISON_MINE then
-				GarryUp_ShowMinerAdvisor();
-				GarryUp_Print("We recommend you consume [Miner's Coffee] and [Preserved Mining Pick].");
+				garryup.ShowMinerAdvisor();
+				garryup.Print("We recommend you consume [Miner's Coffee] and [Preserved Mining Pick].");
 			else
 				--Auto-hide miner advisor
-				GarryUp_HideMinerAdvisor();
+				garryup.HideMinerAdvisor();
 			end
 	elseif event == GarryUpData.EVENT_ZONE_CHANGED then
 		--Zone changed check for specific zone baits and fish to catch
 		guCurrentZone = GetZoneText();
 		
 		if GU_DEBUG then
-			GarryUp_Print("New zone: "..guCurrentZone);
+			garryup.Print("New zone: "..guCurrentZone);
 		end
 		
-		GarryUp_RecommendAngler(guCurrentZone);
+		garryup.RecommendAngler(guCurrentZone);
 	elseif event == GarryUpData.EVENT_LOGIN then
 		--Initial world data is now available
 		
 		-- Check buff initial state
 		guCurrentZone = GetZoneText();
-		guHookWasActive = GarryUp_CheckBuff(GarryUpData.BUFF_HOOK);
-		guBobberWasActive = GarryUp_CheckBuff(GarryUpData.BUFF_BOBBER);
+		guHookWasActive = garryup.CheckBuff(GarryUpData.BUFF_HOOK);
+		guBobberWasActive = garryup.CheckBuff(GarryUpData.BUFF_BOBBER);
 		--Bait info will be cought by the 'zone changed'
 		
 		--PLayer info
 		guPlayerFaction = UnitFactionGroup("player");
 		
 		if GU_DEBUG then
-			GarryUp_Print(GarryUpData.EVENT_LOGIN.." Current Zone: "..guCurrentZone);
-			GarryUp_Print(GarryUpData.EVENT_LOGIN.." BobberWasActive? "..GarryUp_BoolToString(guBobberWasActive));
-			GarryUp_Print(GarryUpData.EVENT_LOGIN.." HookWasActive? "..GarryUp_BoolToString(guHookWasActive));
+			garryup.Print(GarryUpData.EVENT_LOGIN.." Current Zone: "..guCurrentZone);
+			garryup.Print(GarryUpData.EVENT_LOGIN.." BobberWasActive? "..garryup.BoolToString(guBobberWasActive));
+			garryup.Print(GarryUpData.EVENT_LOGIN.." HookWasActive? "..garryup.BoolToString(guHookWasActive));
 		end	
 	
 		-- now, all data is available 
 		guFullyLoaded = true;
 	else
 		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-			GarryUp_Print("Unhandled event: "..event);
+			garryup.Print("Unhandled event: "..event);
 		end
 	end
 
 	-- Update Draenor data on any event
-	GarryUp_RefreshDraenor();
+	garryup.RefreshDraenor();
 		
 end
 
-function GarryUp_OnButtonFishClick()
-	GarryUp_ShowAngler();
+function garryup.OnButtonFishClick()
+	garryup.ShowAngler();
 end
 
-function GarryUp_OnButtonMountClick()
+function garryup.OnButtonMountClick()
 	GarryUpMOMFrame:Show();
-	GarryUp_RefreshMOM();
+	garryup.RefreshMOM();
 end
 
-function GarryUp_OnButtonGarryUpClick()
-	GarryUp_ShowMain();
+function garryup.OnButtonGarryUpClick()
+	garryup.ShowMain();
 end
 
 
-function GarryUp_InitItemButton(buttonRef, itemID)
+function garryup.InitItemButton(buttonRef, itemID)
 	local name, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID);
 	
 	if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
-		GarryUp_Print("Set button Icon itemID"..itemID.." name:"..name.." texture:"..icon);
+		garryup.Print("Set button Icon itemID"..itemID.." name:"..name.." texture:"..icon);
 	end
 	
 	buttonRef:SetAttribute("type", "item");
@@ -231,11 +230,11 @@ function GarryUp_InitItemButton(buttonRef, itemID)
 	buttonRef:SetAttribute("enabled", true);
 end
 
-function GarryUp_SetItemButtonActive(buttonRef, active)
+function garryup.SetItemButtonActive(buttonRef, active)
 	buttonRef:SetAttribute("enabled", true);
 end
 
-function GarryUp_IsInDraenor(excludeGarrison)
+function garryup.IsInDraenor(excludeGarrison)
 	local ret = false;
 	local zone = GetZoneText();
 	
@@ -260,7 +259,7 @@ function GarryUp_IsInDraenor(excludeGarrison)
 	return ret;
 end
 
-function GarryUp_Print(text, color)
+function garryup.Print(text, color)
 	local chatText = GarryUpData.COLOR_ADDON..GetAddOnMetadata("GarryUp","Title").." - "..GarryUpData.COLOR_END;
 	
 	if color then
@@ -272,7 +271,7 @@ function GarryUp_Print(text, color)
 	print(chatText);
 end
 
-function GarryUp_BoolToString(boolValue)
+function garryup.BoolToString(boolValue)
 	if boolValue then
 		return "true";
 	else
@@ -280,7 +279,7 @@ function GarryUp_BoolToString(boolValue)
 	end
 end
 
-function GarryUp_CheckBuff(buffName)
+function garryup.CheckBuff(buffName)
 	local ret = false;
 	local i=1;
 	
@@ -298,7 +297,7 @@ function GarryUp_CheckBuff(buffName)
 	return ret;
 end
 
-function GarryUp_EnumerateAllBuff()
+function garryup.EnumerateAllBuff()
 	local ret = "";
 	local i=1;
 	
@@ -313,17 +312,17 @@ function GarryUp_EnumerateAllBuff()
 	return ret;
 end
 
-function GarryUp_GetAchData(achID)
+function garryup.GetAchData(achID)
 	local achTbl = { GetAchievementCriteriaInfo(achID,1) };
 	return achTbl[4].."/"..achTbl[5];
 end
 
-function GarryUp_GetAchDataGold(achID)
+function garryup.GetAchDataGold(achID)
 	local achTbl = { GetAchievementCriteriaInfo(achID,1) };
 	return math.floor(achTbl[4] / 10000) .."/".. math.floor(achTbl[5] / 10000);
 end
 
-function GarryUp_GetAchProgressColor(achID)
+function garryup.GetAchProgressColor(achID)
 	local retColor = GarryUpData.COLOR_PROGRESS_0;
 	local achTbl = { GetAchievementCriteriaInfo(achID,1) };
 	local progress = math.floor(achTbl[4] / achTbl[5] * 100 + 0.5);
@@ -342,7 +341,7 @@ function GarryUp_GetAchProgressColor(achID)
 end
 
 
-function GarryUp_GetQuestLineData(questLine)
+function garryup.GetQuestLineData(questLine)
 	local questCount = 0;
 	local questCompletedCount = 0;
 
@@ -357,7 +356,7 @@ function GarryUp_GetQuestLineData(questLine)
 	return questCompletedCount.."/"..questCount;
 end
 
-function GarryUp_GetQuestLineBulkText(questLine)
+function garryup.GetQuestLineBulkText(questLine)
 	local outText = "";
 
 	for key, value in ipairs(questLine) do
@@ -373,19 +372,19 @@ function GarryUp_GetQuestLineBulkText(questLine)
 	return outText;
 end
 
-function GarryUp_GetAnglerDataBulkText()
+function garryup.GetAnglerDataBulkText()
 	local outText = "";
 	
 	for key, _ in ipairs(GarryUpData.Angler) do
 		if not GarryUpData.Angler[key].Skip then
 			local id, name, _, completed, _, _, _, _, _, icon = GetAchievementInfo(GarryUpData.Angler[key].AchId);
 			
-			outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END..GarryUp_GetAchProgressColor(id)..name;
+			outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END..garryup.GetAchProgressColor(id)..name;
 			
 			if completed then
 				outText = outText.." "..GarryUpData.COLOR_END..GarryUpData.TXTICO_CHECK.."\r";
 			else
-				outText = outText.." ("..GarryUp_GetAchData(id)..")"..GarryUpData.COLOR_END.."\r";
+				outText = outText.." ("..garryup.GetAchData(id)..")"..GarryUpData.COLOR_END.."\r";
 			end	
 		end
 	end
@@ -393,7 +392,7 @@ function GarryUp_GetAnglerDataBulkText()
 	return outText;
 end
 
-function GarryUp_GetAnglerData()
+function garryup.GetAnglerData()
 	local completeCount, totalCount = 0, 0;
 	
 	for key, _ in ipairs(GarryUpData.Angler) do
@@ -411,31 +410,31 @@ function GarryUp_GetAnglerData()
 	return completeCount.."/"..totalCount;
 end
 
-function GarryUp_RecommendAngler(targetZone)
+function garryup.RecommendAngler(targetZone)
 	--check if we're in a zone first (otherwise it crashes when stoning)
-	if GarryUp_IsInDraenor(true) then 
+	if garryup.IsInDraenor(true) then 
 		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-			GarryUp_Print("Draenor!");
+			garryup.Print("Draenor!");
 		end
 		
 		for key, _ in ipairs(GarryUpData.Angler) do
 			if GarryUpData.Angler[key].Zone == targetZone then
-				GarryUp_Print("We recommend you fish for "..GarryUpData.COLOR_GREEN..GarryUpData.Angler[key].FishName..GarryUpData.COLOR_END.."!");
+				garryup.Print("We recommend you fish for "..GarryUpData.COLOR_GREEN..GarryUpData.Angler[key].FishName..GarryUpData.COLOR_END.."!");
 				GarryUpAnglerFrameBaitButton:Show();
-				GarryUp_InitItemButton(GarryUpAnglerFrameBaitButton, GarryUpData.Angler[key].BaitId);
+				garryup.InitItemButton(GarryUpAnglerFrameBaitButton, GarryUpData.Angler[key].BaitId);
 			end
 		end			
 	else
 		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-			GarryUp_Print("Not in Draenor...");
+			garryup.Print("Not in Draenor...");
 		end
 		-- We're not in Draenor anymore!
 		GarryUpAnglerFrameBaitButton:Hide();
 	end
 end
 
-function GarryUp_GetBaitBuff(targetZone)
-	local baitId = GarryUp_GetBait(targetZone);	
+function garryup.GetBaitBuff(targetZone)
+	local baitId = garryup.GetBait(targetZone);	
 	
 	if baitId then
 		--The buff is equal to the item name in this case
@@ -445,9 +444,9 @@ function GarryUp_GetBaitBuff(targetZone)
 	return nil;
 end
 
-function GarryUp_GetBait(targetZone)
+function garryup.GetBait(targetZone)
 	--check if we're in a zone first (there are no baits outside Draenor)
-	if GarryUp_IsInDraenor(true) then
+	if garryup.IsInDraenor(true) then
 		for key, _ in ipairs(GarryUpData.Angler) do
 			if GarryUpData.Angler[key].Zone == targetZone then
 				return GarryUpData.Angler[key].BaitId;
@@ -459,30 +458,30 @@ function GarryUp_GetBait(targetZone)
 	return nil;
 end
 
-function GarryUp_ShowAngler()
+function garryup.ShowAngler()
 	GarryUpAnglerFrame:Show();
-	GarryUp_RefreshAngler();
+	garryup.RefreshAngler();
 end
 
-function GarryUp_RefreshAngler()
+function garryup.RefreshAngler()
 	if guFullyLoaded then
-		GarryUpAnglerFrameText:SetText(GarryUp_GetAnglerDataBulkText());
+		GarryUpAnglerFrameText:SetText(garryup.GetAnglerDataBulkText());
 		
 		-- Hook
-		GarryUp_InitItemButton(GarryUpAnglerFrameHookButton, GarryUpData.ITEM_BLADEBONE_HOOK);
+		garryup.InitItemButton(GarryUpAnglerFrameHookButton, GarryUpData.ITEM_BLADEBONE_HOOK);
 		-- Bobber
-		GarryUp_InitItemButton(GarryUpAnglerFrameBobberButton, GarryUpData.ITEM_OVERSIZED_BOBBER);
+		garryup.InitItemButton(GarryUpAnglerFrameBobberButton, GarryUpData.ITEM_OVERSIZED_BOBBER);
 		-- Bait
-		if GarryUp_IsInDraenor(true) then
+		if garryup.IsInDraenor(true) then
 			GarryUpAnglerFrameBaitButton:Show();
-			GarryUp_InitItemButton(GarryUpAnglerFrameBaitButton, GarryUp_GetBait(guCurrentZone));
+			garryup.InitItemButton(GarryUpAnglerFrameBaitButton, garryup.GetBait(guCurrentZone));
 		else
 			GarryUpAnglerFrameBaitButton:Hide();
 		end
 	end
 end
 
-function GarryUp_GetDraenorDataBulkText()
+function garryup.GetDraenorDataBulkText()
 	local outText = "";
 	
 	for key, _ in ipairs(GarryUpData.BuildingsLv3) do
@@ -494,9 +493,9 @@ function GarryUp_GetDraenorDataBulkText()
 			
 			--TODO: Very ugly hack, need to fix this properly
 			if GarryUpData.BuildingsLv3[key].AchType == "Gold" then
-				outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END.." "..GarryUp_GetAchProgressColor(id).."Draenor Money";
+				outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END.." "..garryup.GetAchProgressColor(id).."Draenor Money";
 			else
-				outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END.." "..GarryUp_GetAchProgressColor(id)..name;
+				outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END.." "..garryup.GetAchProgressColor(id)..name;
 			end
 						
 			if completed then
@@ -507,17 +506,17 @@ function GarryUp_GetDraenorDataBulkText()
 				if GarryUpData.BuildingsLv3[key].AchType == "AchLine" then
 					-- Achievement Line
 					--Note: lazy way of doing things, there should be a table to hold achievement lines
-					outText = outText.." ("..GarryUp_GetAnglerData()..")"..GarryUpData.COLOR_END.."\r";					
+					outText = outText.." ("..garryup.GetAnglerData()..")"..GarryUpData.COLOR_END.."\r";					
 				elseif GarryUpData.BuildingsLv3[key].AchType == "QuestLine" then
 					-- Quest Line
 					--Note: lazy way of doing things, there should be a table to hold quest lines 					
-					outText = outText.." ("..GarryUp_GetQuestLineData(GarryUpData.QST_MOM[guPlayerFaction])..")"..GarryUpData.COLOR_END.."\r";
+					outText = outText.." ("..garryup.GetQuestLineData(GarryUpData.QST_MOM[guPlayerFaction])..")"..GarryUpData.COLOR_END.."\r";
 				elseif GarryUpData.BuildingsLv3[key].AchType == "Gold" then
 					-- Gold
-					outText = outText.." ("..GarryUp_GetAchDataGold(GarryUpData.BuildingsLv3[key].AchId)..")"..GarryUpData.COLOR_END.."\r";
+					outText = outText.." ("..garryup.GetAchDataGold(GarryUpData.BuildingsLv3[key].AchId)..")"..GarryUpData.COLOR_END.."\r";
 				else
 					-- Standard
-					outText = outText.." ("..GarryUp_GetAchData(GarryUpData.BuildingsLv3[key].AchId)..")"..GarryUpData.COLOR_END.."\r";
+					outText = outText.." ("..garryup.GetAchData(GarryUpData.BuildingsLv3[key].AchId)..")"..GarryUpData.COLOR_END.."\r";
 				end
 			end
 			
@@ -527,51 +526,51 @@ function GarryUp_GetDraenorDataBulkText()
 	return outText;
 end
 
-function GarryUp_RefreshMOM()
+function garryup.RefreshMOM()
 	if guFullyLoaded then
-		GarryUpMOMFrameScrollText:SetText(GarryUp_GetMOMDataBulkText());
+		GarryUpMOMFrameScrollText:SetText(garryup.GetMOMDataBulkText());
 	end
 end
 
-function GarryUp_GetMOMDataBulkText()
+function garryup.GetMOMDataBulkText()
 	local outText = "";
 	
 	local _, name, _, completed, _, _, _, _, _, icon = GetAchievementInfo(GarryUpData.QST_MOM.AchId);
 	
 	if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
-		GarryUp_Print("MOM Icon: name:"..name.." texture:"..icon);
-		GarryUp_Print("Player Faction:"..guPlayerFaction);
+		garryup.Print("MOM Icon: name:"..name.." texture:"..icon);
+		garryup.Print("Player Faction:"..guPlayerFaction);
 	end
 	
 	outText = GarryUpData.TXTICO_START .. icon .. GarryUpData.TXTICO_END..GetAchievementLink(GarryUpData.QST_MOM.AchId).. "\n\n";
 	
-	outText = outText..GarryUp_GetQuestLineBulkText(GarryUpData.QST_MOM[guPlayerFaction]);
+	outText = outText..garryup.GetQuestLineBulkText(GarryUpData.QST_MOM[guPlayerFaction]);
 	
 	return outText;
 end
 
-function GarryUp_ShowMain()
+function garryup.ShowMain()
 	GarryUpFrame:Show();
-	GarryUp_RefreshDraenor();
+	garryup.RefreshDraenor();
 end
 
-function GarryUp_RefreshDraenor()
+function garryup.RefreshDraenor()
 	if guFullyLoaded then
-		GarryUpFrameText:SetText(GarryUp_GetDraenorDataBulkText());
+		GarryUpFrameText:SetText(garryup.GetDraenorDataBulkText());
 	end
 end
 
-function GarryUp_ShowMinerAdvisor()
+function garryup.ShowMinerAdvisor()
 	--Texture to use for portrait: 95893
 	SetPortraitTexture(GarryUpMinerAdvisorFrame.portrait, "player")
 	GarryUpMinerAdvisorFrame:Show();
 end
 
-function GarryUp_HideMinerAdvisor()
+function garryup.HideMinerAdvisor()
 	GarryUpMinerAdvisorFrame:Hide();
 end
 
-function GarryUp_ResetWindow()
+function garryup.ResetWindow()
 	GarryUpAnglerFrame:SetClampedToScreen(true);
 	GarryUpAnglerFrame:SetWidth(GU_FRAME_W);
 	GarryUpAnglerFrame:SetHeight(GU_FRAME_H);
@@ -587,7 +586,7 @@ function GarryUp_ResetWindow()
 	GarryUpFrame:Show();
 end
 
-function GarryUp_PrintHelp()
+function garryup.PrintHelp()
 	local helpText = "List of valid commands:\r"
 	helpText = helpText.."/gup reset: Resets the window position to TOP LEFT.\r";
 	helpText = helpText.."/gup show: Shows the window.\r";
@@ -599,20 +598,20 @@ function GarryUp_PrintHelp()
 	helpText = helpText.."/gup debug+: Increase debugging level. (give more details)\r";
 	helpText = helpText.."/gup debug+: Decrease debugging level. (give less details)\r";
 	
-	GarryUp_Print(helpText);
+	garryup.Print(helpText);
 end
 
-function GarryUp_ToggleDebug()
+function garryup.ToggleDebug()
 	GU_DEBUG = not GU_DEBUG;
 	
 	if GU_DEBUG then
-		GarryUp_Print("Debugging "..GarryUpData.COLOR_GREEN.."Enabled"..GarryUpData.COLOR_END.." (Level: "..GarryUpData.DEBUG_LEVEL..")");
+		garryup.Print("Debugging "..GarryUpData.COLOR_GREEN.."Enabled"..GarryUpData.COLOR_END.." (Level: "..GarryUpData.DEBUG_LEVEL..")");
 	else
-		GarryUp_Print("Debugging "..GarryUpData.COLOR_RED.."Disabled"..GarryUpData.COLOR_END);
+		garryup.Print("Debugging "..GarryUpData.COLOR_RED.."Disabled"..GarryUpData.COLOR_END);
 	end
 end
 
-function GarryUp_ChangeDebugLevel(levelDelta)
+function garryup.ChangeDebugLevel(levelDelta)
 	GU_DEBUG_LEVEL =  GU_DEBUG_LEVEL + levelDelta;
 	
 	if GU_DEBUG_LEVEL > 5 then
@@ -621,34 +620,34 @@ function GarryUp_ChangeDebugLevel(levelDelta)
 		GU_DEBUG_LEVEL = 0;
 	end
 	
-	GarryUp_Print("Debugging Level set to: "..GU_DEBUG_LEVEL);
+	garryup.Print("Debugging Level set to: "..GU_DEBUG_LEVEL);
 end
 
-function GarryUp_SlashCommand(args, editbox)
+function garryup.SlashCommand(args, editbox)
     
 	if args == "show" then
 		GarryUpFrame:Show();
-		GarryUp_ShowAngler()
+		garryup.ShowAngler()
 	elseif args == "hide" then
 		GarryUpAnglerFrame:Hide();
 	elseif args == "fish" then
-		GarryUp_Print(GarryUp_GetAnglerDataBulkText());
+		garryup.Print(garryup.GetAnglerDataBulkText());
 	elseif args == "draenor" then
-		GarryUp_Print(GarryUp_GetDraenorDataBulkText());
+		garryup.Print(garryup.GetDraenorDataBulkText());
 	elseif args == "reset" then
-		GarryUp_ResetWindow();
-		GarryUp_Print("Frame position reset.")
+		garryup.ResetWindow();
+		garryup.Print("Frame position reset.")
 	elseif args == "help" or args == "?" then
-		GarryUp_PrintHelp();
+		garryup.PrintHelp();
 	elseif args == "debug" then
-		GarryUp_ToggleDebug();
+		garryup.ToggleDebug();
 	elseif args == "debug+" then
-		GarryUp_ChangeDebugLevel(1);		
+		garryup.ChangeDebugLevel(1);		
 	elseif args == "debug-" then
-		GarryUp_ChangeDebugLevel(-1);
+		garryup.ChangeDebugLevel(-1);
 	else
-		GarryUp_Print("Unknown Command '"..args.."'.");
-		GarryUp_PrintHelp();
+		garryup.Print("Unknown Command '"..args.."'.");
+		garryup.PrintHelp();
 	end
 end
 

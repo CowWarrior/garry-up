@@ -145,7 +145,7 @@
 		<OnMouseUp>
 		  self:StopMovingOrSizing()
 		</OnMouseUp>
-		<OnLoad>GarryUp_OnMiniFrameLoad()</OnLoad>		
+		<OnLoad>GarryUp.OnMiniFrameLoad()</OnLoad>		
 	</Scripts>	
 	<Size>
 		<AbsDimension x="75" y="75"/>
@@ -179,7 +179,7 @@
 		<Button name="$parentGarryUpButton" hidden="false" inherits="ActionButtonTemplate">
 			<Anchors><Anchor point="BOTTOM"><Offset><AbsDimension x="0" y="10" /></Offset></Anchor></Anchors>
 			<Scripts>
-				<OnClick>GarryUp_OnButtonGarryUpClick()</OnClick>
+				<OnClick>GarryUp.OnButtonGarryUpClick()</OnClick>
 			</Scripts>
 		</Button>
 	</Frames>
@@ -188,7 +188,7 @@
 <!-- This frame is the main one, listing top achievements -->
 <Frame name="GarryUpFrame" inherits="GarryUpSimpleFrameTemplate" >
 	<Scripts>
-		<OnLoad>GarryUp_OnMainFrameLoad()</OnLoad>
+		<OnLoad>GarryUp.OnMainFrameLoad()</OnLoad>
 	</Scripts>
 	<Size>
 		<AbsDimension x="240" y="300"/>
@@ -200,14 +200,14 @@
 		<Button name="$parentFishButton" hidden="false" inherits="ActionButtonTemplate">
 			<Anchors><Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="8" y="9" /></Offset></Anchor></Anchors>
 			<Scripts>
-				<OnClick>GarryUp_OnButtonFishClick()</OnClick>
+				<OnClick>GarryUp.OnButtonFishClick()</OnClick>
 			</Scripts>
 		</Button>
 	
 		<Button name="$parentMountButton" hidden="false" inherits="ActionButtonTemplate">
 			<Anchors><Anchor point="BOTTOMLEFT"><Offset><AbsDimension x="48" y="9" /></Offset></Anchor></Anchors>
 			<Scripts>
-				<OnClick>GarryUp_OnButtonMountClick()</OnClick>
+				<OnClick>GarryUp.OnButtonMountClick()</OnClick>
 			</Scripts>
 		</Button>
 	</Frames>
@@ -249,7 +249,7 @@
 <Frame name="GarryUpMinerAdvisorFrame" inherits="GarryUpNPCFrameTemplate">
 	<Scripts>
 		<OnLoad>
-			GarryUp_OnMinerAdviserFrameLoad();
+			GarryUp.OnMinerAdviserFrameLoad();
 			GarryUpMinerAdvisorFrameTitle:SetText("Miner Advisor");
 			GarryUpMinerAdvisorFrameText:SetText("I should get a coffee, or three...");
 		</OnLoad>
@@ -266,10 +266,10 @@
 </Frame>
 
 <!-- This Frame is Hidden, it serves as a hook for events. -->
-<Frame name="GarryUpCoreFrame" toplevel="true" frameStrata="LOW" movable="true" enableMouse="true" hidden="true" parent="UIParent">
+<Frame name="GarryUpCoreFrame" toplevel="true" frameStrata="LOW" movable="false" enableMouse="false" hidden="true" parent="UIParent">
   <Scripts>
-  	<OnLoad function="GarryUp_OnLoad" />
-	<OnEvent function="GarryUp_OnEvent" />
+  	<OnLoad>GarryUp.OnLoad()</OnLoad>
+	<OnEvent>GarryUp.OnEvent(self,event,...)</OnEvent>
   </Scripts>
 </Frame>
 
