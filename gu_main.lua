@@ -6,17 +6,20 @@ local _, garryup = ...
 -- *
 -- * Created by: CowWarrior
 -- * Created on: 2019-01-11
--- * Updated on: 2019-01-25
+-- * Updated on: 2019-01-26
 -- * 
 -- * Tested on : WOW 8.1
 -- *
 -- *****************************************************************************
 
 -- Change log:
--- Now has full ist of achievements
+-- Now has full list of achievements
 -- Now shows achievements specific to your faction.
 -- Now shows all achievements icons
 -- Re-scoped data to use only one global vatiable
+-- Fixed bug where zone specific bait would cause add-on to crash
+-- Implemented user settings
+-- Implemented User Interface Options Panel
 
 --Issues
 -- Some text is wider than frames
@@ -28,6 +31,7 @@ local _, garryup = ...
 -- Implement dynamic frame height
 -- Implement links to achievements
 -- Implement hide on combat option
+
 
 -- re-scoping
 GarryUp = garryup; -- Make local code available globally
@@ -45,16 +49,17 @@ local guBobberWasActive = false;
 local guCurrentZone = "";
 local guAutoHideOnCombat = false;
 local guAutoShowOnFish = false;
-local guPlayerFaction = ""
+local guPlayerFaction = "";
 local guFullyLoaded = false;
 
 
 function garryup.OnLoad()
 	-- Register Slash commands
-	SLASH_GarryUp1 = "/gup"
+	SLASH_GarryUp1 = "/gup";
 	SlashCmdList["GarryUp"] = garryup.SlashCommand;
 
 	-- Resgister Events
+	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_ADDON_LOADED);
 	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_BUFF_CHANGED);
 	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_LOOT);
 	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_ZONE_CHANGED);
@@ -63,9 +68,51 @@ function garryup.OnLoad()
 	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_MINIZONE_CHANGED);
 	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_QUEST_COMPLETE);
 	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_BAG_UPDATE);
+	GarryUpCoreFrame:RegisterEvent(GarryUpData.EVENT_COMBAT_INITIATED);
 	
 	-- All done
-	garryup.Print("v"..GetAddOnMetadata("GarryUp","Version").." loaded. (type /gup for options)", GarryUpData.COLOR_ADDON);	
+	garryup.Print("v"..GetAddOnMetadata("GarryUp","Version").." loaded. (type /gup for options)", GarryUpData.COLOR_ADDON);
+end
+
+function GarryUp.OnLoadOptions(panel)
+	panel.name = "GarryUp"
+	GarryUpOptionsFrameTitle:SetText("Garry Up ! v"..GetAddOnMetadata("GarryUp","Version").." - Options");
+	GarryUpOptionsFrameText:SetText(GetAddOnMetadata("GarryUp","Notes"));
+
+	--Set dispay text of check buttons
+	if (GarryUpOptionsFrameProgressPercentCheck) then
+		GarryUpOptionsFrameProgressPercentCheckText:SetText(GarryUpData.COLOR_GRAY.."Display Progress as percentage (not implemented)"..GarryUpData.COLOR_END);
+		GarryUpOptionsFrameProgressPercentCheck:Disable();
+		GarryUpOptionsFrameProgressBarCheckText:SetText(GarryUpData.COLOR_GRAY.."Display progress as progress bar (not implemented)"..GarryUpData.COLOR_END);
+		GarryUpOptionsFrameProgressBarCheck:Disable();
+		GarryUpOptionsFrameProgressCompleteCheckText:SetText("Display completed tasks");
+		GarryUpOptionsFrameMuteMiningCheckText:SetText("Disable Mining advisor");
+		GarryUpOptionsFrameMuteFishingCheckText:SetText("Disable Fishing advisor");
+		GarryUpOptionsFrameHideCombatCheckText:SetText("Hide add-on when enterign combat");
+	end
+
+	-- When the player clicks okay, run this function.
+	--panel.okay = function (self) SC_ChaChingPanel_Close(); end;
+
+	-- When the player clicks cancel, run this function.
+	--panel.cancel = function (self)  SC_ChaChingPanel_CancelOrLoad();  end;
+
+	-- Add the panel to the Interface Options
+	InterfaceOptions_AddCategory(panel);
+end
+
+function garryup.OnClickOptionsCheck(checkButton)
+	if checkButton.variable then
+		if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
+			garryup.Print("Option changed:"..checkButton.variable);
+		end
+		
+		--Update Player Setting
+		GarryUpUserSettings[checkButton.variable] = checkButton:GetChecked();
+		
+		--refresh UI
+		garryup.RefreshAllFrames()
+	end
 end
 
 function garryup.OnMainFrameLoad()
@@ -87,60 +134,18 @@ function garryup.OnMiniFrameLoad()
 	MiniFrameGarryUpButton.icon:SetPoint("TOPLEFT", 0, 0);
 end
 
-function garryup.OnEvent(self, event, ...)
+function garryup.OnEvent(self, event, arg1, ...)
 	if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
 		garryup.Print("Event:"..event);
 	end
 	
 	if event == GarryUpData.EVENT_LOOT then
 		garryup.RefreshAngler();
+	elseif event == GarryUpData.EVENT_COMBAT_INITIATED then
+		garryup.CombatStart();
 	elseif event == GarryUpData.EVENT_BUFF_CHANGED then
 		--Check for bait/hook for current zone
-		
-		if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
-			garryup.Print("BaitWasActive? "..garryup.BoolToString(guBaitWasActive));
-			garryup.Print("HookWasActive? "..garryup.BoolToString(guHookWasActive));
-			garryup.Print("BobberWasActive? "..garryup.BoolToString(guBobberWasActive));
-			garryup.Print("Active buffs:\r"..garryup.EnumerateAllBuff());
-		end		
-		
-		if garryup.CheckBuff(GarryUpData.BUFF_BOBBER) then
-			-- we got bobber
-			guBobberWasActive = true;
-		elseif guBobberWasActive then
-			-- we lost bobber
-			PlaySound(GarryUpData.SOUND_QUEST_LOG_ABANDON_QUEST);
-			guBobberWasActive = false;
-			garryup.Print("You need to reapply your "..GarryUpData.BUFF_BOBBER.."!", GarryUpData.COLOR_RED);
-		else
-			-- bobber is off
-		end
-		-- update button state
-		garryup.SetItemButtonActive(GarryUpAnglerFrameBobberButton, not guBobberWasActive)
-
-		if garryup.CheckBuff(GarryUpData.BUFF_HOOK) then
-			-- we got hook
-			guHookWasActive = true;
-		elseif guHookWasActive then
-			-- we lost hook
-			PlaySound(GarryUpData.SOUND_QUEST_LOG_ABANDON_QUEST);
-			guHookWasActive = false;
-			garryup.Print("You need to reapply your "..GarryUpData.BUFF_HOOK.."!", GarryUpData.COLOR_RED);
-		else
-			-- hook is off
-		end
-		
-		if garryup.CheckBuff(garryup.GetBaitBuff(guCurrentZone)) then
-			-- we got bait
-			guBaitWasActive = true;
-		elseif guBaitWasActive then
-			-- we lost bait
-			PlaySound(GarryUpData.SOUND_QUEST_LOG_ABANDON_QUEST);
-			guBaitWasActive = false;
-			garryup.Print("You need to reapply "..garryup.GetBaitBuff(guCurrentZone).."!", GarryUpData.COLOR_RED);
-		else
-			-- bait is off
-		end
+		garryup.RefreshAnglerBuffs();
 	elseif event == GarryUpData.EVENT_QUEST_COMPLETE then
 		--Refresh
 		garryup.RefreshMOM();
@@ -148,17 +153,11 @@ function garryup.OnEvent(self, event, ...)
 		--Refresh Salvage
 		--Already cought in refresh below. No need to refresh here
 	elseif event == GarryUpData.EVENT_MINIZONE_CHANGED then
-			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-				garryup.Print("Subzone Changed: "..GetMinimapZoneText());
-			end
-			
-			if GetMinimapZoneText() == GarryUpData.MINIZONE_GARRISON_MINE then
-				garryup.ShowMinerAdvisor();
-				garryup.Print("We recommend you consume [Miner's Coffee] and [Preserved Mining Pick].");
-			else
-				--Auto-hide miner advisor
-				garryup.HideMinerAdvisor();
-			end
+		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
+			garryup.Print("Subzone Changed: "..GetMinimapZoneText());
+		end
+		
+		garryup.RefreshMiningAdvisor();
 	elseif event == GarryUpData.EVENT_ZONE_CHANGED then
 		--Zone changed check for specific zone baits and fish to catch
 		guCurrentZone = GetZoneText();
@@ -168,35 +167,28 @@ function garryup.OnEvent(self, event, ...)
 		end
 		
 		garryup.RecommendAngler(guCurrentZone);
+	elseif event == GarryUpData.EVENT_ADDON_LOADED then
+		if GU_DEBUG and GU_DEBUG_LEVEL > 0 then
+			if arg1 then
+				garryup.Print("Addon loaded: "..arg1);
+			end
+		end
+	
+		-- Load settings
+		if arg1 == "GarryUp" then
+			garryup.ApplyUserSettings();
+		end
 	elseif event == GarryUpData.EVENT_LOGIN then
 		--Initial world data is now available
-		
-		-- Check buff initial state
-		guCurrentZone = GetZoneText();
-		guHookWasActive = garryup.CheckBuff(GarryUpData.BUFF_HOOK);
-		guBobberWasActive = garryup.CheckBuff(GarryUpData.BUFF_BOBBER);
-		--Bait info will be cought by the 'zone changed'
-		
-		--PLayer info
-		guPlayerFaction = UnitFactionGroup("player");
-		
-		if GU_DEBUG then
-			garryup.Print(GarryUpData.EVENT_LOGIN.." Current Zone: "..guCurrentZone);
-			garryup.Print(GarryUpData.EVENT_LOGIN.." BobberWasActive? "..garryup.BoolToString(guBobberWasActive));
-			garryup.Print(GarryUpData.EVENT_LOGIN.." HookWasActive? "..garryup.BoolToString(guHookWasActive));
-		end	
-	
-		-- now, all data is available 
-		guFullyLoaded = true;
+		garryup.InitGarryUp();
 	else
-		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
+		if GU_DEBUG and GU_DEBUG_LEVEL >= 0 then
 			garryup.Print("Unhandled event: "..event);
 		end
 	end
 
 	-- Update Draenor data on any event
 	garryup.RefreshDraenor();
-		
 end
 
 function garryup.OnButtonFishClick()
@@ -212,22 +204,83 @@ function garryup.OnButtonGarryUpClick()
 	garryup.ShowMain();
 end
 
-
-function garryup.InitItemButton(buttonRef, itemID)
-	local name, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID);
+function garryup.InitGarryUp()
+	-- Check buff initial state
+	guCurrentZone = GetZoneText();
+	guHookWasActive = garryup.CheckBuff(GarryUpData.BUFF_HOOK);
+	guBobberWasActive = garryup.CheckBuff(GarryUpData.BUFF_BOBBER);
+	--Bait info will be cought by the 'zone changed'
 	
-	if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
-		garryup.Print("Set button Icon itemID"..itemID.." name:"..name.." texture:"..icon);
+	--PLayer info
+	guPlayerFaction = UnitFactionGroup("player");
+	
+	if GU_DEBUG then
+		garryup.Print(GarryUpData.EVENT_LOGIN.." Current Zone: "..guCurrentZone);
+		garryup.Print(GarryUpData.EVENT_LOGIN.." BobberWasActive? "..garryup.BoolToString(guBobberWasActive));
+		garryup.Print(GarryUpData.EVENT_LOGIN.." HookWasActive? "..garryup.BoolToString(guHookWasActive));
+	end	
+
+	-- now, all data is available 
+	guFullyLoaded = true;
+end
+
+function garryup.ApplyUserSettings()
+	if GU_DEBUG and GU_DEBUG_LEVEL > 0 then
+		if GarryUpUserSettings then
+			garryup.Print("Applying User Settings\n"..table.concat(GarryUpUserSettings, "\n"));
+		else
+			garryup.Print("No User Settings found, using defaults.");
+		end
+	end
+
+	if not GarryUpUserSettings then
+		--very first initialization
+		GarryUpUserSettings = {};
+		GarryUpUserSettings.DisplayProgressPercentage = false;
+		GarryUpUserSettings.DisplayProgressProgressBar = false;
+		GarryUpUserSettings.DisplayProgressCompleted = true;
+		GarryUpUserSettings.MuteMiningAdvisor = false;
+		GarryUpUserSettings.MuteFishingAdvisor = false;
+		GarryUpUserSettings.HideOnCombat = true;
 	end
 	
-	buttonRef:SetAttribute("type", "item");
-	buttonRef:SetAttribute("*item1", name);
-	buttonRef:SetAttribute("itemid", itemID);
-	buttonRef:SetText(name);
-	buttonRef.icon:SetTexture(icon);
-	buttonRef:SetAttribute("checkselfcast","1");
-	buttonRef:SetAttribute("checkfocuscast","1");
-	buttonRef:SetAttribute("enabled", true);
+	garryup.RefreshUserSettingsUI();
+end
+
+function garryup.RefreshUserSettingsUI()
+	--Could probably be setup usng the key-value
+	GarryUpOptionsFrameProgressPercentCheck:SetChecked(GarryUpUserSettings.DisplayProgressPercentage);
+	GarryUpOptionsFrameProgressBarCheck:SetChecked(GarryUpUserSettings.DisplayProgressProgressBar);
+	GarryUpOptionsFrameProgressCompleteCheck:SetChecked(GarryUpUserSettings.DisplayProgressCompleted);
+	GarryUpOptionsFrameMuteMiningCheck:SetChecked(GarryUpUserSettings.MuteMiningAdvisor);
+	GarryUpOptionsFrameMuteFishingCheck:SetChecked(GarryUpUserSettings.MuteFishingAdvisor);
+	GarryUpOptionsFrameHideCombatCheck:SetChecked(GarryUpUserSettings.HideOnCombat);
+end
+
+function garryup.InitItemButton(buttonRef, itemID)
+	if itemID then
+		local name, _, _, _, _, _, _, _, _, icon = GetItemInfo(itemID);
+		
+		if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
+			garryup.Print("Set button Icon itemID"..itemID.." name:"..name.." texture:"..icon);
+		end
+		
+		buttonRef:SetAttribute("type", "item");
+		buttonRef:SetAttribute("*item1", name);
+		buttonRef:SetAttribute("itemid", itemID);
+		buttonRef:SetText(name);
+		buttonRef.icon:SetTexture(icon);
+		buttonRef:SetAttribute("checkselfcast","1");
+		buttonRef:SetAttribute("checkfocuscast","1");
+		buttonRef:SetAttribute("enabled", true);
+	else
+		--empty ID 
+		if GU_DEBUG and GU_DEBUG_LEVEL >= 0 then
+			garryup.Print("InitItemButton itemID is nil!", GarryUpData.COLOR_RED);
+			garryup.Print("Current zone: "..guCurrentZone, GarryUpData.COLOR_YELLOW);
+		end
+		
+	end
 end
 
 function garryup.SetItemButtonActive(buttonRef, active)
@@ -312,6 +365,22 @@ function garryup.EnumerateAllBuff()
 	return ret;
 end
 
+function garryup.CombatStart()
+	if GarryUpUserSettings.HideOnCombat then
+		--Hide detail UI's
+		GarryUpAnglerFrame:Hide();
+		GarryUpMOMFrame:Hide();
+		GarryUpFrame:Hide();
+		GarryUpMinerAdvisorFrame:Hide();
+	end
+end
+
+function garryup.RefreshAllFrames()
+	garryup.RefreshDraenor();
+	garryup.RefreshAngler();
+	garryup.RefreshMOM();
+end
+
 function garryup.GetAchData(achID)
 	local achTbl = { GetAchievementCriteriaInfo(achID,1) };
 	return achTbl[4].."/"..achTbl[5];
@@ -361,12 +430,13 @@ function garryup.GetQuestLineBulkText(questLine)
 
 	for key, value in ipairs(questLine) do
 		if IsQuestFlaggedCompleted(questLine[key].ID) then
-			outText = outText..GarryUpData.COLOR_PROGRESS_100..string.rep(" ", questLine[key].DEPTH*4)..questLine[key].NAME..GarryUpData.COLOR_END..GarryUpData.TXTICO_CHECK;
+			--check user setting to display completed achievements
+			if GarryUpUserSettings.DisplayProgressCompleted then	
+				outText = outText..GarryUpData.COLOR_PROGRESS_100..string.rep(" ", questLine[key].DEPTH*4)..questLine[key].NAME..GarryUpData.COLOR_END..GarryUpData.TXTICO_CHECK.."\n";
+			end
 		else
-			outText = outText..GarryUpData.COLOR_PROGRESS_0..string.rep(" ", questLine[key].DEPTH*4)..questLine[key].NAME..GarryUpData.COLOR_END;
+			outText = outText..GarryUpData.COLOR_PROGRESS_0..string.rep(" ", questLine[key].DEPTH*4)..questLine[key].NAME..GarryUpData.COLOR_END.."\n";
 		end
-		
-		outText = outText.."\n";
 	end
 
 	return outText;
@@ -379,13 +449,16 @@ function garryup.GetAnglerDataBulkText()
 		if not GarryUpData.Angler[key].Skip then
 			local id, name, _, completed, _, _, _, _, _, icon = GetAchievementInfo(GarryUpData.Angler[key].AchId);
 			
-			outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END..garryup.GetAchProgressColor(id)..name;
-			
-			if completed then
-				outText = outText.." "..GarryUpData.COLOR_END..GarryUpData.TXTICO_CHECK.."\r";
-			else
-				outText = outText.." ("..garryup.GetAchData(id)..")"..GarryUpData.COLOR_END.."\r";
-			end	
+			--check user settign to skip completed achievements.
+			if not completed or GarryUpUserSettings.DisplayProgressCompleted then	
+				outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END..garryup.GetAchProgressColor(id)..name;
+				
+				if completed then
+					outText = outText.." "..GarryUpData.COLOR_END..GarryUpData.TXTICO_CHECK.."\r";
+				else
+					outText = outText.." ("..garryup.GetAchData(id)..")"..GarryUpData.COLOR_END.."\r";
+				end
+			end
 		end
 	end
 	
@@ -411,25 +484,27 @@ function garryup.GetAnglerData()
 end
 
 function garryup.RecommendAngler(targetZone)
-	--check if we're in a zone first (otherwise it crashes when stoning)
-	if garryup.IsInDraenor(true) then 
-		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-			garryup.Print("Draenor!");
-		end
-		
-		for key, _ in ipairs(GarryUpData.Angler) do
-			if GarryUpData.Angler[key].Zone == targetZone then
-				garryup.Print("We recommend you fish for "..GarryUpData.COLOR_GREEN..GarryUpData.Angler[key].FishName..GarryUpData.COLOR_END.."!");
-				GarryUpAnglerFrameBaitButton:Show();
-				garryup.InitItemButton(GarryUpAnglerFrameBaitButton, GarryUpData.Angler[key].BaitId);
+	if not GarryUpUserSettings.MuteFishingAdvisor then
+		--check if we're in a zone first (otherwise it crashes when stoning)
+		if garryup.IsInDraenor(true) then 
+			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
+				garryup.Print("Draenor!");
 			end
-		end			
-	else
-		if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
-			garryup.Print("Not in Draenor...");
+			
+			for key, _ in ipairs(GarryUpData.Angler) do
+				if GarryUpData.Angler[key].Zone == targetZone then
+					garryup.Print("We recommend you fish for "..GarryUpData.COLOR_GREEN..GarryUpData.Angler[key].FishName..GarryUpData.COLOR_END.."!");
+					GarryUpAnglerFrameBaitButton:Show();
+					garryup.InitItemButton(GarryUpAnglerFrameBaitButton, GarryUpData.Angler[key].BaitId);
+				end
+			end			
+		else
+			if GU_DEBUG and GU_DEBUG_LEVEL > 1 then
+				garryup.Print("Not in Draenor...");
+			end
+			-- We're not in Draenor anymore!
+			GarryUpAnglerFrameBaitButton:Hide();
 		end
-		-- We're not in Draenor anymore!
-		GarryUpAnglerFrameBaitButton:Hide();
 	end
 end
 
@@ -481,6 +556,53 @@ function garryup.RefreshAngler()
 	end
 end
 
+function garryup.RefreshAnglerBuffs()
+	if GU_DEBUG and GU_DEBUG_LEVEL > 2 then
+		garryup.Print("BaitWasActive? "..garryup.BoolToString(guBaitWasActive));
+		garryup.Print("HookWasActive? "..garryup.BoolToString(guHookWasActive));
+		garryup.Print("BobberWasActive? "..garryup.BoolToString(guBobberWasActive));
+		garryup.Print("Active buffs:\r"..garryup.EnumerateAllBuff());
+	end		
+	
+	if garryup.CheckBuff(GarryUpData.BUFF_BOBBER) then
+		-- we got bobber
+		guBobberWasActive = true;
+	elseif guBobberWasActive then
+		-- we lost bobber
+		PlaySound(GarryUpData.SOUND_QUEST_LOG_ABANDON_QUEST);
+		guBobberWasActive = false;
+		garryup.Print("You need to reapply your "..GarryUpData.BUFF_BOBBER.."!", GarryUpData.COLOR_RED);
+	else
+		-- bobber is off
+	end
+	-- update button state
+	garryup.SetItemButtonActive(GarryUpAnglerFrameBobberButton, not guBobberWasActive)
+
+	if garryup.CheckBuff(GarryUpData.BUFF_HOOK) then
+		-- we got hook
+		guHookWasActive = true;
+	elseif guHookWasActive then
+		-- we lost hook
+		PlaySound(GarryUpData.SOUND_QUEST_LOG_ABANDON_QUEST);
+		guHookWasActive = false;
+		garryup.Print("You need to reapply your "..GarryUpData.BUFF_HOOK.."!", GarryUpData.COLOR_RED);
+	else
+		-- hook is off
+	end
+	
+	if garryup.CheckBuff(garryup.GetBaitBuff(guCurrentZone)) then
+		-- we got bait
+		guBaitWasActive = true;
+	elseif guBaitWasActive then
+		-- we lost bait
+		PlaySound(GarryUpData.SOUND_QUEST_LOG_ABANDON_QUEST);
+		guBaitWasActive = false;
+		garryup.Print("You need to reapply "..garryup.GetBaitBuff(guCurrentZone).."!", GarryUpData.COLOR_RED);
+	else
+		-- bait is off
+	end
+end
+
 function garryup.GetDraenorDataBulkText()
 	local outText = "";
 	
@@ -489,37 +611,39 @@ function garryup.GetDraenorDataBulkText()
 		-- Only show matching faction or faction neutral achievements
 		if (not GarryUpData.BuildingsLv3[key].FactionGroup) or (GarryUpData.BuildingsLv3[key].FactionGroup == guPlayerFaction) then
 	
-			local id, name, _, completed, _, _, _, _, _, icon = GetAchievementInfo(GarryUpData.BuildingsLv3[key].AchId);			
+			local id, name, _, completed, _, _, _, _, _, icon = GetAchievementInfo(GarryUpData.BuildingsLv3[key].AchId);
 			
-			--TODO: Very ugly hack, need to fix this properly
-			if GarryUpData.BuildingsLv3[key].AchType == "Gold" then
-				outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END.." "..garryup.GetAchProgressColor(id).."Draenor Money";
-			else
-				outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END.." "..garryup.GetAchProgressColor(id)..name;
-			end
-						
-			if completed then
-				--this is complete. no need to show progress
-				outText = outText.." "..GarryUpData.COLOR_END..GarryUpData.TXTICO_CHECK.."\r";
-			else
-				--Show specific progress
-				if GarryUpData.BuildingsLv3[key].AchType == "AchLine" then
-					-- Achievement Line
-					--Note: lazy way of doing things, there should be a table to hold achievement lines
-					outText = outText.." ("..garryup.GetAnglerData()..")"..GarryUpData.COLOR_END.."\r";					
-				elseif GarryUpData.BuildingsLv3[key].AchType == "QuestLine" then
-					-- Quest Line
-					--Note: lazy way of doing things, there should be a table to hold quest lines 					
-					outText = outText.." ("..garryup.GetQuestLineData(GarryUpData.QST_MOM[guPlayerFaction])..")"..GarryUpData.COLOR_END.."\r";
-				elseif GarryUpData.BuildingsLv3[key].AchType == "Gold" then
-					-- Gold
-					outText = outText.." ("..garryup.GetAchDataGold(GarryUpData.BuildingsLv3[key].AchId)..")"..GarryUpData.COLOR_END.."\r";
+			--check user ssettign to display completed achievements
+			if not completed or GarryUpUserSettings.DisplayProgressCompleted then			
+				--TODO: Very ugly hack, need to fix this properly
+				if GarryUpData.BuildingsLv3[key].AchType == "Gold" then
+					outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END.." "..garryup.GetAchProgressColor(id).."Draenor Money";
 				else
-					-- Standard
-					outText = outText.." ("..garryup.GetAchData(GarryUpData.BuildingsLv3[key].AchId)..")"..GarryUpData.COLOR_END.."\r";
+					outText = outText..GarryUpData.TXTICO_START..icon..GarryUpData.TXTICO_END.." "..garryup.GetAchProgressColor(id)..name;
+				end
+							
+				if completed then
+					--this is complete. no need to show progress
+					outText = outText.." "..GarryUpData.COLOR_END..GarryUpData.TXTICO_CHECK.."\r";
+				else
+					--Show specific progress
+					if GarryUpData.BuildingsLv3[key].AchType == "AchLine" then
+						-- Achievement Line
+						--Note: lazy way of doing things, there should be a table to hold achievement lines
+						outText = outText.." ("..garryup.GetAnglerData()..")"..GarryUpData.COLOR_END.."\r";					
+					elseif GarryUpData.BuildingsLv3[key].AchType == "QuestLine" then
+						-- Quest Line
+						--Note: lazy way of doing things, there should be a table to hold quest lines 					
+						outText = outText.." ("..garryup.GetQuestLineData(GarryUpData.QST_MOM[guPlayerFaction])..")"..GarryUpData.COLOR_END.."\r";
+					elseif GarryUpData.BuildingsLv3[key].AchType == "Gold" then
+						-- Gold
+						outText = outText.." ("..garryup.GetAchDataGold(GarryUpData.BuildingsLv3[key].AchId)..")"..GarryUpData.COLOR_END.."\r";
+					else
+						-- Standard
+						outText = outText.." ("..garryup.GetAchData(GarryUpData.BuildingsLv3[key].AchId)..")"..GarryUpData.COLOR_END.."\r";
+					end
 				end
 			end
-			
 		end
 	end
 
@@ -542,8 +666,7 @@ function garryup.GetMOMDataBulkText()
 		garryup.Print("Player Faction:"..guPlayerFaction);
 	end
 	
-	outText = GarryUpData.TXTICO_START .. icon .. GarryUpData.TXTICO_END..GetAchievementLink(GarryUpData.QST_MOM.AchId).. "\n\n";
-	
+	outText = GarryUpData.TXTICO_START .. icon .. GarryUpData.TXTICO_END..GetAchievementLink(GarryUpData.QST_MOM.AchId).. "\n\n";		
 	outText = outText..garryup.GetQuestLineBulkText(GarryUpData.QST_MOM[guPlayerFaction]);
 	
 	return outText;
@@ -560,6 +683,18 @@ function garryup.RefreshDraenor()
 	end
 end
 
+
+function garryup.RefreshMiningAdvisor()
+	if not GarryUpUserSettings.MuteMiningAdvisor then
+		if GetMinimapZoneText() == GarryUpData.MINIZONE_GARRISON_MINE then
+			garryup.ShowMinerAdvisor();
+			garryup.Print("We recommend you consume [Miner's Coffee] and [Preserved Mining Pick].");
+		else
+			--Auto-hide miner advisor
+			garryup.HideMinerAdvisor();
+		end
+	end
+end 		
 function garryup.ShowMinerAdvisor()
 	--Texture to use for portrait: 95893
 	SetPortraitTexture(GarryUpMinerAdvisorFrame.portrait, "player")

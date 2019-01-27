@@ -273,4 +273,138 @@
   </Scripts>
 </Frame>
 
+<!-- This frame manages player settings. (Interface Options) -->
+<Frame name="GarryUpOptionsFrame">
+	<Layers>
+      <Layer level="OVERLAY">
+          <FontString name="$parentTitle" inherits="GameFontNormalLarge" justifyH="LEFT" justifyV="TOP" text="Garry Up! - Options">
+              <Anchors>
+                  <Anchor point="TOP">
+                      <Offset>
+                          <AbsDimension x="5" y="-8" />
+                      </Offset>
+                  </Anchor>
+              </Anchors>
+          </FontString>
+          <FontString name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP" text="this is some sample text">
+              <Anchors>
+                  <Anchor point="TOPLEFT">
+                      <Offset>
+                          <AbsDimension x="5" y="-48" />
+                      </Offset>
+                  </Anchor>
+              </Anchors>
+          </FontString>
+      </Layer>
+	</Layers>
+	<Frames>
+		<CheckButton name="$parentProgressPercentCheck" inherits="OptionsCheckButtonTemplate" checked="true">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="-80"></AbsDimension>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<KeyValues>
+				<KeyValue key="variable" value="DisplayProgressPercentage"/>
+			</KeyValues>
+			<Scripts>
+				<OnClick>
+					GarryUp.OnClickOptionsCheck(self)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parentProgressBarCheck" inherits="OptionsCheckButtonTemplate" checked="true">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="-100"></AbsDimension>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<KeyValues>
+				<KeyValue key="variable" value="DisplayProgressProgressBar"/>
+			</KeyValues>
+			<Scripts>
+				<OnClick>
+					GarryUp.OnClickOptionsCheck(self)
+				</OnClick>
+			</Scripts>			
+		</CheckButton>
+		<CheckButton name="$parentProgressCompleteCheck" inherits="OptionsCheckButtonTemplate" checked="true">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="-120"></AbsDimension>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<KeyValues>
+				<KeyValue key="variable" value="DisplayProgressCompleted"/>
+			</KeyValues>
+			<Scripts>
+				<OnClick>
+					GarryUp.OnClickOptionsCheck(self)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parentMuteMiningCheck" inherits="OptionsCheckButtonTemplate" checked="true">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="-140"></AbsDimension>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<KeyValues>
+				<KeyValue key="variable" value="MuteMiningAdvisor"/>
+			</KeyValues>
+			<Scripts>
+				<OnClick>
+					GarryUp.OnClickOptionsCheck(self)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parentMuteFishingCheck" inherits="OptionsCheckButtonTemplate" checked="true">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="-160"></AbsDimension>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<KeyValues>
+				<KeyValue key="variable" value="MuteFishingAdvisor"/>
+			</KeyValues>
+			<Scripts>
+				<OnClick>
+					GarryUp.OnClickOptionsCheck(self)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+		<CheckButton name="$parentHideCombatCheck" inherits="OptionsCheckButtonTemplate" checked="true">
+			<Anchors>
+				<Anchor point="TOPLEFT">
+					<Offset>
+						<AbsDimension x="20" y="-180"></AbsDimension>
+					</Offset>
+				</Anchor>
+			</Anchors>
+			<KeyValues>
+				<KeyValue key="variable" value="DisplayProgressPercentage"/>
+			</KeyValues>
+			<Scripts>
+				<OnClick>
+					GarryUp.OnClickOptionsCheck(self)
+				</OnClick>
+			</Scripts>
+		</CheckButton>
+	</Frames>
+	<Scripts>
+		<OnLoad>GarryUp.OnLoadOptions(self);</OnLoad>
+	</Scripts>
+</Frame>
+
+
 </Ui>

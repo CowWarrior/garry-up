@@ -4,11 +4,10 @@
 ## Author: CowWarrior
 ## eMail: 
 ## URL: https://wow.curseforge.com/projects/garry-up
-## Version: 0.3.225340
+## Version: 1.0.4
 ## LoadOnDemand: 0
 ## DefaultState: enabled
 ## SavedVariables:
-## SavedVariablesPerCharacter:
+## SavedVariablesPerCharacter: GarryUpUserSettings
 
 gu_main.xml
-

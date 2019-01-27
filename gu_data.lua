@@ -22,10 +22,12 @@ GarryUpData = {
 	COLOR_ADDON = "|cffff007f",
 	COLOR_END = "|r",
 	COLOR_RED = "|cffff0000",
+	COLOR_YELLOW = "|cffffd100",
 	COLOR_GREEN = "|cff00ff00",
 	COLOR_BLUE = "|cff0000ff",
 	COLOR_WHITE = "|cffffffff",
 	COLOR_BLACK = "|cff000000",
+	COLOR_GRAY = "|cff707070",
 	COLOR_PROGRESS_0 = "|cff7d7d7d", --grey
 	COLOR_PROGRESS_25 = "|cff7d7d00", --dark yellow
 	COLOR_PROGRESS_50 = "|cffffd100", --brighter yellow
@@ -46,6 +48,9 @@ GarryUpData = {
 	EVENT_MINIZONE_CHANGED = "ZONE_CHANGED",
 	EVENT_QUEST_COMPLETE = "QUEST_TURNED_IN",
 	EVENT_BAG_UPDATE = "BAG_UPDATE",
+	EVENT_ADDON_LOADED = "ADDON_LOADED",
+	EVENT_COMBAT_INITIATED = "PLAYER_REGEN_DISABLED", --Indirect but most reliable
+	EVENT_COMBAT_ENDED = "PLAYER_REGEN_ENABLED",
 
 	-- Buff Constants
 	BUFF_HOOK = "Bladebone Hook",
@@ -236,13 +241,13 @@ GarryUpData.QST_MOM["Horde"] = {
 
 --Fishing constants (Draenor Angler)
 GarryUpData["Angler"] = {
-	{AchId = 9462, BaitId = 0, FishName = "anything, as long as you have a proper bait", Zone = GU_ZONE_GARRISON, Skip = true},
-	{AchId = 9455, BaitId = 110291, FishName = "Fire Ammonite", Zone = GU_ZONE_FROSTFIRE},
-	{AchId = 9456, BaitId = 110293, FishName = "Abyssal Gulper Eel", Zone = GU_ZONE_ARAK},
-	{AchId = 9457, BaitId = 110294, FishName = "Blackwater Whiptail", Zone = GU_ZONE_TALADOR},
-	{AchId = 9458, BaitId = 110290, FishName = "Blind Lake Sturgeon", Zone = GU_ZONE_SHADOWMOON},
-	{AchId = 9459, BaitId = 110289, FishName = "Fat Sleepers", Zone = GU_ZONE_NAGRAND},
-	{AchId = 9460, BaitId = 110274, FishName = "Jawless Skulker", Zone = GU_ZONE_GORGOND},
-	{AchId = 9461, BaitId = 110292, FishName = "Sea Scorpion", Zone = GU_ZONE_DRAENOR_OCEAN}
+	{AchId = 9462, BaitId = 0, FishName = "anything, as long as you have a proper bait", Zone = GarryUpData.ZONE_GARRISON, Skip = true},
+	{AchId = 9455, BaitId = 110291, FishName = "Fire Ammonite", Zone = GarryUpData.ZONE_FROSTFIRE},
+	{AchId = 9456, BaitId = 110293, FishName = "Abyssal Gulper Eel", Zone = GarryUpData.ZONE_ARAK},
+	{AchId = 9457, BaitId = 110294, FishName = "Blackwater Whiptail", Zone = GarryUpData.ZONE_TALADOR},
+	{AchId = 9458, BaitId = 110290, FishName = "Blind Lake Sturgeon", Zone = GarryUpData.ZONE_SHADOWMOON},
+	{AchId = 9459, BaitId = 110289, FishName = "Fat Sleepers", Zone = GarryUpData.ZONE_NAGRAND},
+	{AchId = 9460, BaitId = 110274, FishName = "Jawless Skulker", Zone = GarryUpData.ZONE_GORGOND},
+	{AchId = 9461, BaitId = 110292, FishName = "Sea Scorpion", Zone = GarryUpData.ZONE_DRAENOR_OCEAN}
 }
 
